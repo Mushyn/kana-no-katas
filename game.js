@@ -1,5 +1,6 @@
 // ── État global ──
 let mode = 'both';
+let showDiacritics = false; // dakuten + handakuten
 let deckSize = 1;
 let showRomaji = false;
 let score = { ok: 0, err: 0 };
@@ -18,6 +19,13 @@ function shuffle(arr) {
   return a;
 }
 
+function toggleDiacritics(btn) {
+  showDiacritics = !showDiacritics;
+  btn.textContent = showDiacritics ? '゛゜ on' : '゛゜ off';
+  btn.classList.toggle('active', showDiacritics);
+  resetGame();
+}
+
 function colLabelFor(romaji) {
   for (const col of COLS) {
     if (col.label === 'SEP' || col.label === 'SEP2') continue;
@@ -31,6 +39,7 @@ function buildFullDeck() {
   const cards = [];
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') return;
+    if (!showDiacritics && col.diacritic) return;
     col.s.forEach(v => {
       if (!v) return;
       if (mode === 'both' || mode === 'hiragana')
@@ -47,12 +56,13 @@ function calcCellSize() {
   const zone = document.getElementById('grid-zone');
   const zoneH = zone.getBoundingClientRect().height;
   const ROWS = 5;
-  const HDR = 26;      // col-hdr
-  const PADDING = 16;  // padding grid-scroll haut+bas
-  const GAP = 4;       // gap * (ROWS-1)
-  const available = zoneH - HDR - PADDING - (GAP * (ROWS - 1));
+  const HDR = 30;       // col-hdr height
+  const PADDING = 20;   // padding grid-scroll haut+bas + marge sécu
+  const GAP = 4;        // gap entre cellules (ROWS-1 fois)
+  const EXTRA = 8;      // marge de sécurité pour éviter tout débordement
+  const available = zoneH - HDR - PADDING - (GAP * (ROWS - 1)) - EXTRA;
   const size = Math.floor(available / ROWS);
-  return Math.max(52, size);
+  return Math.max(44, size);
 }
 
 // ── Grille ──
@@ -66,11 +76,13 @@ function buildGrid() {
 
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') {
+      if (!showDiacritics) return; // cacher séparateur aussi
       const sep = document.createElement('div');
       sep.className = 'sep-col';
       grid.appendChild(sep);
       return;
     }
+    if (!showDiacritics && col.diacritic) return;
     const colEl = document.createElement('div');
     colEl.className = 'kana-col';
 

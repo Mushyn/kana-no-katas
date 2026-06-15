@@ -90,8 +90,9 @@ body {
   overflow-x: auto; overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x;
-  padding: 8px 10px;
+  padding: 6px 10px;
   direction: rtl;
+  align-content: flex-start;
 }
 #grid {
   display: inline-flex; flex-direction: row; gap: 4px;
@@ -101,6 +102,7 @@ body {
 .kana-col {
   display: flex; flex-direction: column; gap: 4px;
   justify-content: flex-start;
+  overflow: hidden;
 }
 
 .col-hdr {
@@ -148,9 +150,9 @@ body {
 
 /* ── Zone cartes 34% ── */
 #card-zone {
-  flex: 0 0 34%; display: flex; flex-direction: column;
+  flex: 0 0 27%; display: flex; flex-direction: column;
   background: var(--bg); border-top: 1px solid var(--border);
-  overflow: hidden; min-height: 160px; max-height: 240px;
+  overflow: hidden; min-height: 130px; max-height: 200px;
 }
 
 #deck-controls {
@@ -165,6 +167,8 @@ body {
   cursor: pointer; transition: all 0.15s;
 }
 .dc-btn.active { background: #534AB7; color: white; border-color: #534AB7; }
+
+#btndiac { font-size: 18px; letter-spacing: 2px; padding: 4px 12px; line-height: 1; }
 
 #msg { font-size: 16px; text-align: center; padding: 2px 0; min-height: 20px; flex-shrink: 0; }
 
