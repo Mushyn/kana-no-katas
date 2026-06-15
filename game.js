@@ -3,13 +3,10 @@ let mode = 'both';
 let deckSize = 1;
 let showRomaji = false;
 let score = { ok: 0, err: 0 };
-let fullDeck = [];
-let activeDeck = [];
-let selectedCard = null;
-let cells = {};
-let errorMap = {};    // id -> { card, count }
-let successSet = new Set();
-let locked = false;
+let fullDeck = [], activeDeck = [];
+let selectedCard = null, cells = {};
+let errorMap = {}, successSet = new Set(), locked = false;
+let dragCard = null;
 
 // ── Utilitaires ──
 function shuffle(arr) {
@@ -24,17 +21,17 @@ function shuffle(arr) {
 function colLabelFor(romaji) {
   for (const col of COLS) {
     if (col.label === 'SEP' || col.label === 'SEP2') continue;
-    if (col.syllabes && col.syllabes.includes(romaji)) return col.label;
+    if (col.s && col.s.includes(romaji)) return col.label;
   }
   return '';
 }
 
-// ── Construction du paquet ──
+// ── Paquet ──
 function buildFullDeck() {
   const cards = [];
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') return;
-    col.syllabes.forEach(v => {
+    col.s.forEach(v => {
       if (!v) return;
       if (mode === 'both' || mode === 'hiragana')
         cards.push({ romaji: v, char: H[v], type: 'h', id: 'h-' + v, errors: 0 });
@@ -45,7 +42,7 @@ function buildFullDeck() {
   return shuffle(cards);
 }
 
-// ── Construction de la grille ──
+// ── Grille ──
 function buildGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -58,7 +55,6 @@ function buildGrid() {
       grid.appendChild(sep);
       return;
     }
-
     const colEl = document.createElement('div');
     colEl.className = 'kana-col';
 
@@ -67,52 +63,47 @@ function buildGrid() {
     hdr.textContent = col.label;
     colEl.appendChild(hdr);
 
-    ROWS_LABELS.forEach((v, i) => {
-      const romaji = col.syllabes[i];
+    ['a','i','u','e','o'].forEach((v, i) => {
+      const romaji = col.s[i];
       const cell = document.createElement('div');
-
       if (!romaji) {
         cell.className = 'cell empty-slot';
         colEl.appendChild(cell);
         return;
       }
-
       cell.className = 'cell';
       cell.dataset.romaji = romaji;
+      const rh = document.createElement('div');
+      rh.className = 'rhint';
+      rh.textContent = romaji;
+      cell.appendChild(rh);
 
-      const rhint = document.createElement('div');
-      rhint.className = 'rhint';
-      rhint.textContent = romaji;
-      cell.appendChild(rhint);
-
-      // Drag & drop desktop
-      cell.addEventListener('dragover', e => {
-        e.preventDefault();
-        if (!locked) cell.classList.add('drag-over');
-      });
+      // Desktop drag
+      cell.addEventListener('dragover', e => { e.preventDefault(); if (!locked) cell.classList.add('drag-over'); });
       cell.addEventListener('dragleave', () => cell.classList.remove('drag-over'));
       cell.addEventListener('drop', e => {
         e.preventDefault();
         cell.classList.remove('drag-over');
         if (!locked) handleDrop(cell, e.dataTransfer.getData('cid'));
       });
-
-      // Touch mobile
-      cell.addEventListener('click', () => {
-        if (!locked) handleCellClick(cell);
-      });
+      // Tap (sélection en 2 temps)
+      cell.addEventListener('click', () => { if (!locked) handleCellClick(cell); });
+      // Touch drop
+      cell.addEventListener('touchend', e => {
+        e.preventDefault();
+        if (!locked && dragCard) { handleDrop(cell, dragCard); dragCard = null; }
+      }, { passive: false });
 
       cells[romaji] = cell;
       colEl.appendChild(cell);
     });
-
     grid.appendChild(colEl);
   });
 }
 
-// ── Rendu du paquet de cartes ──
+// ── Cartes ──
 function renderDeck() {
-  const deckEl = document.getElementById('deck');
+  const deckEl = document.getElementById('deck-scroll');
   deckEl.innerHTML = '';
 
   activeDeck.forEach(card => {
@@ -122,16 +113,14 @@ function renderDeck() {
     el.draggable = true;
     el.dataset.flipped = '0';
 
-    // Badge erreur
     const badge = document.createElement('div');
     badge.className = 'err-badge';
     badge.textContent = '✗' + card.errors;
     el.appendChild(badge);
 
-    // Caractère
-    const charSpan = document.createElement('span');
-    charSpan.textContent = card.char;
-    el.appendChild(charSpan);
+    const cs = document.createElement('span');
+    cs.textContent = card.char;
+    el.appendChild(cs);
 
     if (showRomaji) {
       const r = document.createElement('div');
@@ -140,31 +129,28 @@ function renderDeck() {
       el.appendChild(r);
     }
 
-    // Double clic → retourner la carte
-    let clickTimer = null;
+    // Double tap → retourner
+    let tapTimer = null;
     el.addEventListener('click', () => {
       if (locked) return;
-      if (clickTimer) {
-        clearTimeout(clickTimer);
-        clickTimer = null;
+      if (tapTimer) {
+        clearTimeout(tapTimer); tapTimer = null;
         flipCard(el, card);
       } else {
-        clickTimer = setTimeout(() => {
-          clickTimer = null;
+        tapTimer = setTimeout(() => {
+          tapTimer = null;
           if (el.dataset.flipped === '1') return;
           if (selectedCard === card.id) {
-            selectedCard = null;
-            el.classList.remove('selected');
+            selectedCard = null; el.classList.remove('selected');
           } else {
             document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
-            selectedCard = card.id;
-            el.classList.add('selected');
+            selectedCard = card.id; el.classList.add('selected');
           }
         }, 220);
       }
     });
 
-    // Drag desktop
+    // Desktop drag
     el.addEventListener('dragstart', e => {
       if (locked) { e.preventDefault(); return; }
       e.dataTransfer.setData('cid', card.id);
@@ -174,42 +160,36 @@ function renderDeck() {
     });
     el.addEventListener('dragend', () => el.classList.remove('dragging'));
 
+    // Touch drag
+    el.addEventListener('touchstart', () => {
+      if (locked) return;
+      dragCard = card.id;
+      document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }, { passive: true });
+    el.addEventListener('touchend', () => {
+      el.classList.remove('selected');
+    }, { passive: true });
+
     deckEl.appendChild(el);
   });
 
   updateScores();
 }
 
-// ── Retourner une carte (double clic) ──
 function flipCard(el, card) {
   if (el.dataset.flipped === '1') {
-    el.dataset.flipped = '0';
-    el.classList.remove('flipped');
-    el.innerHTML = '';
-    const badge = document.createElement('div');
-    badge.className = 'err-badge';
-    badge.textContent = '✗' + card.errors;
-    el.appendChild(badge);
-    const c = document.createElement('span');
-    c.textContent = card.char;
-    el.appendChild(c);
-    if (showRomaji) {
-      const r = document.createElement('div');
-      r.className = 'card-romaji';
-      r.textContent = card.romaji;
-      el.appendChild(r);
-    }
+    el.dataset.flipped = '0'; el.classList.remove('flipped'); el.innerHTML = '';
+    const b = document.createElement('div'); b.className = 'err-badge'; b.textContent = '✗' + card.errors; el.appendChild(b);
+    const c = document.createElement('span'); c.textContent = card.char; el.appendChild(c);
+    if (showRomaji) { const r = document.createElement('div'); r.className = 'card-romaji'; r.textContent = card.romaji; el.appendChild(r); }
   } else {
-    el.dataset.flipped = '1';
-    el.classList.add('flipped');
-    el.innerHTML = '';
-    const r = document.createElement('span');
-    r.textContent = card.romaji;
-    el.appendChild(r);
+    el.dataset.flipped = '1'; el.classList.add('flipped'); el.innerHTML = '';
+    const r = document.createElement('span'); r.textContent = card.romaji; el.appendChild(r);
   }
 }
 
-// ── Gestion du dépôt ──
+// ── Dépôt ──
 function handleCellClick(cell) {
   if (!selectedCard) return;
   handleDrop(cell, selectedCard);
@@ -223,35 +203,22 @@ function handleDrop(cell, cardId) {
   if (idx === -1) return;
   const card = activeDeck[idx];
   const romaji = cell.dataset.romaji;
-  const isCorrect = card.romaji === romaji;
 
-  if (isCorrect) {
+  if (card.romaji === romaji) {
     score.ok++;
     activeDeck.splice(idx, 1);
     fullDeck = fullDeck.filter(c => c.id !== cardId);
 
-    // Afficher le char dans la case
-    let charsDiv = cell.querySelector('.chars');
-    if (!charsDiv) {
-      charsDiv = document.createElement('div');
-      charsDiv.className = 'chars';
-      cell.insertBefore(charsDiv, cell.firstChild);
-    }
-    const s = document.createElement('span');
-    s.textContent = card.char;
-    charsDiv.appendChild(s);
+    let cd = cell.querySelector('.chars');
+    if (!cd) { cd = document.createElement('div'); cd.className = 'chars'; cell.insertBefore(cd, cell.firstChild); }
+    const s = document.createElement('span'); s.textContent = card.char; cd.appendChild(s);
 
-    const done = fullDeck.filter(c => c.romaji === romaji).length === 0;
-    if (done) {
-      cell.classList.add('correct');
-      successSet.add(romaji);
+    if (fullDeck.filter(c => c.romaji === romaji).length === 0) {
+      cell.classList.add('correct'); successSet.add(romaji);
     } else {
-      cell.style.borderColor = '#63992299';
-      cell.style.background = 'var(--green-light)';
+      cell.style.borderColor = '#63992299'; cell.style.background = 'var(--green-light)';
     }
-
     showMsg('✓ ' + card.char + ' → ' + romaji, 'ok');
-
     if (activeDeck.length === 0 && fullDeck.length > 0) drawMore();
     if (fullDeck.length === 0) setTimeout(() => showBilan(), 600);
 
@@ -259,43 +226,28 @@ function handleDrop(cell, cardId) {
     score.err++;
     card.errors = (card.errors || 0) + 1;
     errorMap[card.id] = { card, count: card.errors };
-
     cell.classList.add('wrong');
     setTimeout(() => cell.classList.remove('wrong'), 400);
-
-    // Feedback visuel
     showFeedback(card);
-    const correctCell = cells[card.romaji];
-    if (correctCell) {
-      correctCell.classList.add('highlight');
-      setTimeout(() => correctCell.classList.remove('highlight'), 2400);
-    }
-
-    // Réinjection SRS : ~15 cartes plus tard
+    const cc = cells[card.romaji];
+    if (cc) { cc.classList.add('highlight'); setTimeout(() => cc.classList.remove('highlight'), 2400); }
     activeDeck.splice(idx, 1);
-    const insertAt = Math.min(idx + 13 + Math.floor(Math.random() * 5), activeDeck.length);
-    activeDeck.splice(insertAt, 0, card);
+    const at = Math.min(idx + 13 + Math.floor(Math.random() * 5), activeDeck.length);
+    activeDeck.splice(at, 0, card);
   }
-
   renderDeck();
 }
 
-// ── Feedback erreur ──
+// ── Feedback ──
 function showFeedback(card) {
   locked = true;
-  const fb = document.getElementById('feedback');
-  const colLabel = colLabelFor(card.romaji);
   document.getElementById('fb-char').textContent = card.char;
   document.getElementById('fb-romaji').textContent = card.romaji;
-  document.getElementById('fb-col').textContent = 'colonne « ' + colLabel + ' » — ' + card.romaji;
-  fb.style.display = 'block';
-  setTimeout(() => {
-    fb.style.display = 'none';
-    locked = false;
-  }, 2000);
+  document.getElementById('fb-col').textContent = 'colonne « ' + colLabelFor(card.romaji) + ' » — ' + card.romaji;
+  document.getElementById('feedback').style.display = 'block';
+  setTimeout(() => { document.getElementById('feedback').style.display = 'none'; locked = false; }, 2000);
 }
 
-// ── Message rapide ──
 function showMsg(text, type) {
   const el = document.getElementById('msg');
   el.textContent = text;
@@ -304,28 +256,21 @@ function showMsg(text, type) {
   el._t = setTimeout(() => { el.textContent = ''; }, 1600);
 }
 
-// ── Scores ──
 function updateScores() {
-  const retryCount = Object.keys(errorMap).length;
+  const rc = Object.keys(errorMap).length;
   document.getElementById('s-ok').textContent = '✓ ' + score.ok;
   document.getElementById('s-err').textContent = '✗ ' + score.err;
   document.getElementById('s-left').textContent = '◎ ' + fullDeck.length;
-  const retryEl = document.getElementById('s-retry');
-  if (retryCount > 0) {
-    retryEl.style.display = '';
-    retryEl.textContent = '↺ ' + retryCount;
-  } else {
-    retryEl.style.display = 'none';
-  }
+  const re = document.getElementById('s-retry');
+  if (rc > 0) { re.style.display = ''; re.textContent = '↺ ' + rc; } else re.style.display = 'none';
 }
 
-// ── Piocher des cartes ──
 function drawMore() {
-  if (fullDeck.length === 0) return;
+  if (!fullDeck.length) return;
   const n = Math.min(deckSize, fullDeck.length);
   for (let i = 0; i < n; i++) {
-    const card = fullDeck.find(c => !activeDeck.find(a => a.id === c.id));
-    if (card) activeDeck.push(card);
+    const c = fullDeck.find(c => !activeDeck.find(a => a.id === c.id));
+    if (c) activeDeck.push(c);
   }
   renderDeck();
 }
@@ -333,46 +278,31 @@ function drawMore() {
 // ── Bilan ──
 function showBilan() {
   const total = score.ok + score.err;
-  const pct = total > 0 ? Math.round((score.ok / total) * 100) + '%' : '—';
   document.getElementById('b-ok').textContent = score.ok;
   document.getElementById('b-err').textContent = score.err;
-  document.getElementById('b-pct').textContent = pct;
+  document.getElementById('b-pct').textContent = total > 0 ? Math.round(score.ok / total * 100) + '%' : '—';
 
-  const errGrid = document.getElementById('b-errors');
-  errGrid.innerHTML = '';
-  const errCards = Object.values(errorMap).sort((a, b) => b.count - a.count);
-
-  if (errCards.length === 0) {
-    document.getElementById('b-errors-section').style.display = 'none';
-  } else {
-    document.getElementById('b-errors-section').style.display = '';
-    errCards.forEach(({ card, count }) => {
-      const c = document.createElement('div');
-      c.className = 'bilan-card bc-err';
-      c.innerHTML = card.char + '<span>' + card.romaji + '</span><span class="err-cnt">✗' + count + '</span>';
-      errGrid.appendChild(c);
-    });
-  }
-
-  const okGrid = document.getElementById('b-ok-grid');
-  okGrid.innerHTML = '';
-  successSet.forEach(romaji => {
-    const hChar = H[romaji] || '';
-    const kChar = K[romaji] || '';
-    const c = document.createElement('div');
-    c.className = 'bilan-card bc-ok';
-    c.innerHTML = (hChar && kChar ? hChar + kChar : hChar || kChar) + '<span>' + romaji + '</span>';
-    okGrid.appendChild(c);
+  const eg = document.getElementById('b-errors'); eg.innerHTML = '';
+  const ec = Object.values(errorMap).sort((a, b) => b.count - a.count);
+  document.getElementById('b-errors-section').style.display = ec.length ? '' : 'none';
+  ec.forEach(({ card, count }) => {
+    const c = document.createElement('div'); c.className = 'bilan-card bc-err';
+    c.innerHTML = card.char + '<span>' + card.romaji + '</span><span class="err-cnt">✗' + count + '</span>';
+    eg.appendChild(c);
   });
 
+  const og = document.getElementById('b-ok-grid'); og.innerHTML = '';
+  successSet.forEach(r => {
+    const c = document.createElement('div'); c.className = 'bilan-card bc-ok';
+    c.innerHTML = ((H[r] || '') + (K[r] || '')) + '<span>' + r + '</span>';
+    og.appendChild(c);
+  });
   document.getElementById('bilan').style.display = 'block';
 }
 
-function closeBilan() {
-  document.getElementById('bilan').style.display = 'none';
-}
+function closeBilan() { document.getElementById('bilan').style.display = 'none'; }
 
-// ── Contrôles utilisateur ──
+// ── Contrôles ──
 function setMode(m, btn) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -384,55 +314,23 @@ function setDeckSize(n, btn) {
   deckSize = n;
   document.querySelectorAll('.dc-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  activeDeck = [];
-  drawMore();
+  activeDeck = []; drawMore();
 }
 
 function toggleHints() {
   showRomaji = !showRomaji;
-  document.getElementById('btnhint').textContent = showRomaji ? 'Romaji on' : 'Romaji off';
+  document.getElementById('btnhint').textContent = showRomaji ? 'Romaji ✓' : 'Romaji';
   renderDeck();
 }
 
-// ── Reset ──
 function resetGame() {
-  score = { ok: 0, err: 0 };
-  errorMap = {};
-  successSet = new Set();
-  selectedCard = null;
-  locked = false;
-  fullDeck = buildFullDeck();
-  activeDeck = [];
-  buildGrid();
-  drawMore();
+  score = { ok: 0, err: 0 }; errorMap = {}; successSet = new Set();
+  selectedCard = null; locked = false; dragCard = null;
+  fullDeck = buildFullDeck(); activeDeck = [];
+  buildGrid(); drawMore();
   document.getElementById('msg').textContent = '';
   document.getElementById('bilan').style.display = 'none';
   document.getElementById('feedback').style.display = 'none';
 }
 
-// ── PWA : bannière d'installation ──
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'flex';
-});
-
-function installPWA() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(() => {
-    deferredPrompt = null;
-    const banner = document.getElementById('install-banner');
-    if (banner) banner.style.display = 'none';
-  });
-}
-
-function closeBanner() {
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'none';
-}
-
-// ── Init ──
 document.addEventListener('DOMContentLoaded', () => resetGame());
