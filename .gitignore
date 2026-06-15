@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Archives
+*.zip
+*.tar.gz
+
+# Node (si outillage ajouté plus tard)
+node_modules/
+npm-debug.log*
+
+# Env
+.env

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kana no Katas — Apprendre les kanas japonais</title>
+  <meta name="description" content="Jeu de mémorisation des kanas japonais par glisser-déposer avec répétition espacée." />
+  <meta name="theme-color" content="#7F77DD" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Kana no Katas" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="header">
+      <h1>Kana <span id="mode-label">SRS</span></h1>
+      <div id="mode-toggle">
+        <button class="mode-btn active" onclick="setMode('both',this)">ひ+カ</button>
+        <button class="mode-btn" onclick="setMode('hiragana',this)">ひ</button>
+        <button class="mode-btn" onclick="setMode('katakana',this)">カ</button>
+      </div>
+    </div>
+
+    <div id="score-bar">
+      <span class="sp sp-ok" id="s-ok">✓ 0</span>
+      <span class="sp sp-err" id="s-err">✗ 0</span>
+      <span class="sp sp-left" id="s-left">◎ 0</span>
+      <span class="sp sp-retry" id="s-retry" style="display:none">↺ 0</span>
+    </div>
+
+    <div id="grid-wrap"><div id="grid"></div></div>
+
+    <div id="deck-controls">
+      <label>Cartes :</label>
+      <button class="dc-btn active" id="btn1" onclick="setDeckSize(1,this)">1/1</button>
+      <button class="dc-btn" id="btn5" onclick="setDeckSize(5,this)">5/5</button>
+      <button class="dc-btn" id="btnhint" onclick="toggleHints()">Romaji off</button>
+    </div>
+
+    <div id="deck"></div>
+    <div id="msg"></div>
+
+    <div id="actions">
+      <button onclick="resetGame()">↺ Recommencer</button>
+      <button onclick="drawMore()">+ Cartes</button>
+      <button onclick="showBilan()">Bilan</button>
+    </div>
+
+    <!-- Feedback overlay erreur -->
+    <div id="feedback">
+      <div class="fb-char" id="fb-char"></div>
+      <div class="fb-romaji" id="fb-romaji"></div>
+      <div class="fb-col" id="fb-col"></div>
+      <div class="fb-msg">↺ Reproposé dans ~15 cartes</div>
+    </div>
+
+    <!-- Écran bilan -->
+    <div id="bilan">
+      <h2>Bilan de session</h2>
+      <div class="bilan-stats">
+        <div class="bstat ok"><div class="val" id="b-ok">0</div><div class="lbl">Réussis</div></div>
+        <div class="bstat err"><div class="val" id="b-err">0</div><div class="lbl">Erreurs</div></div>
+        <div class="bstat pct"><div class="val" id="b-pct">—</div><div class="lbl">Réussite</div></div>
+      </div>
+      <div class="bilan-section" id="b-errors-section">
+        <h3>Kanas à retravailler</h3>
+        <div class="bilan-grid" id="b-errors"></div>
+      </div>
+      <div class="bilan-section">
+        <h3>Maîtrisés cette session</h3>
+        <div class="bilan-grid" id="b-ok-grid"></div>
+      </div>
+      <button onclick="closeBilan()">← Continuer</button>
+      <button onclick="resetGame()">↺ Recommencer</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(r => console.log('SW enregistré', r.scope))
+          .catch(e => console.warn('SW échec', e));
+      });
+    }
+  </script>
+</body>
+</html>
