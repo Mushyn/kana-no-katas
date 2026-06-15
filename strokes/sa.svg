@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<rect width="200" height="200" fill="#FAFAFA" rx="12"/>
+<line x1="100" y1="10" x2="100" y2="190" stroke="#E0E0E0" stroke-width="1" stroke-dasharray="4,4"/>
+<line x1="10" y1="100" x2="190" y2="100" stroke="#E0E0E0" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="100" y="152" text-anchor="middle" font-size="140" font-family="serif" fill="#EEEEEE" dominant-baseline="middle">さ</text>
+<polyline points="55,60 145,60" stroke="#1565C0" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="145.0,60.0 139.3,64.1 139.3,55.9" fill="#E53935"/>
+<circle cx="55" cy="60" r="9" fill="#E53935"/><text x="55" y="64" text-anchor="middle" font-size="11" font-family="sans-serif" font-weight="bold" fill="white">1</text>
+<polyline points="55,100 145,100" stroke="#1565C0" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="145.0,100.0 139.3,104.1 139.3,95.9" fill="#E53935"/>
+<circle cx="55" cy="100" r="9" fill="#E53935"/><text x="55" y="104" text-anchor="middle" font-size="11" font-family="sans-serif" font-weight="bold" fill="white">2</text>
+<polyline points="110,60 115,130 100,160 75,165 60,150" stroke="#1565C0" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="60.0,150.0 66.9,151.1 61.1,156.9" fill="#E53935"/>
+<circle cx="110" cy="60" r="9" fill="#E53935"/><text x="110" y="64" text-anchor="middle" font-size="11" font-family="sans-serif" font-weight="bold" fill="white">3</text>
+</svg>

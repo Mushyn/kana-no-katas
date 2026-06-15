@@ -82,13 +82,14 @@ body {
 
 /* ── Zone grille 66% ── */
 #grid-zone {
-  flex: 66; overflow: hidden;
+  flex: 1 1 0; overflow: hidden; min-height: 0;
   background: var(--bg2); position: relative;
 }
 #grid-scroll {
   width: 100%; height: 100%;
   overflow-x: auto; overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   padding: 8px 10px;
   direction: rtl;
 }
@@ -115,7 +116,6 @@ body {
   font-size: calc(var(--cell-size, 56px) * 0.55); background: var(--bg); cursor: pointer;
   color: var(--kana-color);
   transition: all 0.15s; position: relative; flex-shrink: 0;
-  touch-action: none;
 }
 .cell.empty-slot { background: transparent; border: none; }
 .cell.drag-over  { border-color: var(--purple); background: var(--purple-light); transform: scale(1.08); }
@@ -148,9 +148,9 @@ body {
 
 /* ── Zone cartes 34% ── */
 #card-zone {
-  flex: 34; display: flex; flex-direction: column;
+  flex: 0 0 34%; display: flex; flex-direction: column;
   background: var(--bg); border-top: 1px solid var(--border);
-  flex-shrink: 0; overflow: hidden;
+  overflow: hidden; min-height: 160px; max-height: 240px;
 }
 
 #deck-controls {
@@ -171,6 +171,7 @@ body {
 #deck-scroll {
   flex: 1; overflow-x: auto; overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   padding: 8px 14px;
   display: flex; align-items: center; gap: 8px;
 }

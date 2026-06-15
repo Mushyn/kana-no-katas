@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<rect width="200" height="200" fill="#FAFAFA" rx="12"/>
+<line x1="100" y1="10" x2="100" y2="190" stroke="#E0E0E0" stroke-width="1" stroke-dasharray="4,4"/>
+<line x1="10" y1="100" x2="190" y2="100" stroke="#E0E0E0" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="100" y="152" text-anchor="middle" font-size="140" font-family="serif" fill="#EEEEEE" dominant-baseline="middle">ト</text>
+<polyline points="80,40 80,168" stroke="#1565C0" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="80.0,168.0 75.9,162.3 84.1,162.3" fill="#E53935"/>
+<circle cx="80" cy="40" r="9" fill="#E53935"/><text x="80" y="44" text-anchor="middle" font-size="11" font-family="sans-serif" font-weight="bold" fill="white">1</text>
+<polyline points="80,90 148,120" stroke="#1565C0" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polygon points="148.0,120.0 141.2,121.5 144.5,113.9" fill="#E53935"/>
+<circle cx="80" cy="90" r="9" fill="#E53935"/><text x="80" y="94" text-anchor="middle" font-size="11" font-family="sans-serif" font-weight="bold" fill="white">2</text>
+</svg>

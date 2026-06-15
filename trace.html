@@ -200,7 +200,11 @@
   <!-- Header -->
   <div id="trace-header">
     <a href="index.html">←</a>
-    <h1>Tracé des kanas</h1>
+    <h1>Tracé</h1>
+    <div style="display:flex;gap:4px;">
+      <button onclick="setTraceMode('hiragana',this)" class="mode-btn active" id="tbtn-h">ひ</button>
+      <button onclick="setTraceMode('katakana',this)" class="mode-btn" id="tbtn-k">カ</button>
+    </div>
     <div id="romaji-display">—</div>
     <div id="kana-display">あ</div>
   </div>
@@ -214,9 +218,9 @@
 
       <!-- Référence -->
       <div class="panel">
-        <div class="panel-label">Référence</div>
+        <div class="panel-label">Ordre des traits</div>
         <div class="panel-body" id="ref-panel">
-          <div id="ref-big-kana">あ</div>
+          <img id="ref-svg" src="strokes/a.svg" alt="tracé" style="width:90%;height:90%;object-fit:contain;"/>
         </div>
       </div>
 
@@ -267,6 +271,9 @@
 
 <script src="data.js"></script>
 <script>
+// ── Mode hiragana / katakana pour les SVGs ──
+let currentMode = 'hiragana';
+
 // ── Données ──
 const ALL_KANAS = [];
 COLS.forEach(col => {
@@ -374,11 +381,19 @@ function selectKana(idx) {
   const romaji = ALL_KANAS[idx];
   const hChar = H[romaji] || '';
   const kChar = K[romaji] || '';
+  const displayChar = currentMode === 'katakana' ? kChar : hChar;
 
-  document.getElementById('kana-display').textContent = hChar || kChar;
+  document.getElementById('kana-display').textContent = displayChar || hChar || kChar;
   document.getElementById('romaji-display').textContent = romaji;
-  document.getElementById('ref-big-kana').textContent = hChar || kChar;
-  document.getElementById('canvas-kana-ghost').textContent = hChar || kChar;
+  document.getElementById('canvas-kana-ghost').textContent = displayChar || hChar || kChar;
+
+  // Charger le SVG de tracé — hiragana = romaji minuscule, katakana = MAJUSCULE
+  const svgKey = currentMode === 'katakana'
+    ? romaji.toUpperCase()
+    : romaji;
+  const img = document.getElementById('ref-svg');
+  img.src = 'strokes/' + svgKey + '.svg';
+  img.alt = (hChar || kChar) + ' — ' + romaji;
 
   // Mettre à jour les pills
   document.querySelectorAll('.kana-pill').forEach((el, i) => {
@@ -407,7 +422,7 @@ function showCompare() {
   }
 
   const romaji = ALL_KANAS[currentIdx];
-  const char = H[romaji] || K[romaji] || '';
+  const char = (currentMode === 'katakana' ? K[romaji] : H[romaji]) || '';
 
   document.getElementById('compare-kana-title').textContent = 'Comparaison — ' + char + ' (' + romaji + ')';
   document.getElementById('cmp-ref-char').textContent = char;
@@ -463,6 +478,15 @@ function closeCompare() {
   document.getElementById('compare-overlay').classList.remove('show');
 }
 
+// ── Mode tracé ──
+function setTraceMode(m, btn) {
+  currentMode = m;
+  document.querySelectorAll('#trace-header .mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildSelector();
+  selectKana(0);
+}
+
 // ── Sélecteur ──
 function buildSelector() {
   const sel = document.getElementById('kana-selector');
@@ -483,7 +507,8 @@ function buildSelector() {
       const idx = ALL_KANAS.indexOf(v);
       const pill = document.createElement('div');
       pill.className = 'kana-pill';
-      pill.innerHTML = (H[v] || K[v] || '') + '<span>' + v + '</span>';
+      const char = currentMode === 'katakana' ? (K[v] || '') : (H[v] || '');
+      pill.innerHTML = char + '<span>' + v + '</span>';
       pill.dataset.idx = idx;
       pill.addEventListener('click', () => selectKana(idx));
       pills.appendChild(pill);
