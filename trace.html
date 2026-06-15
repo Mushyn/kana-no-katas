@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kana no Katas — Tracé</title>
+  <meta name="theme-color" content="#7F77DD" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Écran tracé ── */
+    #trace-app {
+      display: flex; flex-direction: column;
+      height: 100dvh; background: var(--bg2);
+    }
+
+    #trace-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #trace-header a {
+      font-size: 20px; text-decoration: none; color: var(--text2);
+    }
+    #trace-header h1 { font-size: 17px; font-weight: 600; flex: 1; }
+    #kana-display {
+      font-size: 36px; color: var(--purple); font-weight: 300;
+      min-width: 48px; text-align: center;
+    }
+    #romaji-display {
+      font-size: 14px; color: var(--text2); min-width: 32px; text-align: center;
+    }
+
+    /* ── Sélecteur kana ── */
+    #kana-selector {
+      padding: 8px 10px; background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      flex-shrink: 0;
+      direction: rtl;
+    }
+    .kana-group {
+      display: inline-flex; flex-direction: column; gap: 3px;
+      margin-left: 8px; direction: ltr; vertical-align: top;
+    }
+    .kana-group-label {
+      font-size: 10px; color: var(--text3); font-weight: 700;
+      text-align: center; padding: 1px 0;
+    }
+    .kana-pills { display: flex; gap: 3px; }
+    .kana-pill {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--bg2);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.12s;
+      font-size: 16px; color: var(--kana-color, var(--text));
+      flex-shrink: 0;
+    }
+    .kana-pill span { font-size: 8px; color: var(--text3); line-height: 1; }
+    .kana-pill.active { background: var(--purple); border-color: var(--purple); color: white; }
+    .kana-pill.active span { color: rgba(255,255,255,0.8); }
+    .kana-pill.done { background: var(--green-light); border-color: var(--green); }
+
+    /* ── Zone principale ── */
+    #trace-main {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; padding: 10px;
+      gap: 10px;
+    }
+
+    /* ── Référence + Canvas ── */
+    #panels {
+      flex: 1; display: flex; gap: 10px; overflow: hidden;
+    }
+
+    .panel {
+      flex: 1; display: flex; flex-direction: column;
+      background: var(--bg); border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .panel-label {
+      font-size: 12px; font-weight: 600; color: var(--text2);
+      padding: 8px 12px 6px; border-bottom: 1px solid var(--border);
+      text-align: center; flex-shrink: 0;
+    }
+    .panel-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+
+    /* Référence SVG */
+    #ref-kana {
+      font-size: 140px; color: var(--kana-color, var(--text));
+      line-height: 1; user-select: none;
+      opacity: 0.15;
+      position: absolute;
+    }
+    #ref-strokes {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #ref-strokes img {
+      max-width: 85%; max-height: 85%;
+      object-fit: contain;
+    }
+    #ref-big-kana {
+      font-size: 160px; color: #1a1a1a;
+      line-height: 1; user-select: none;
+    }
+
+    /* Canvas */
+    #draw-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      cursor: crosshair; touch-action: none;
+      border-radius: 0 0 14px 14px;
+    }
+    #canvas-kana-ghost {
+      position: absolute;
+      font-size: 140px; color: var(--border);
+      line-height: 1; user-select: none; pointer-events: none;
+      opacity: 0.2;
+    }
+
+    /* ── Contrôles ── */
+    #trace-controls {
+      display: flex; gap: 8px; flex-shrink: 0;
+    }
+    .ctrl-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg);
+      font-size: 13px; color: var(--text2); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ctrl-btn.primary { background: var(--purple); color: white; border-color: var(--purple); }
+    .ctrl-btn.danger  { background: var(--red-light); color: var(--red); border-color: var(--red); }
+    .ctrl-btn.success { background: var(--green-light); color: var(--green); border-color: var(--green); }
+
+    /* ── Overlay comparaison ── */
+    #compare-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    #compare-overlay.show { display: flex; }
+    #compare-box {
+      background: var(--bg); border-radius: 20px;
+      padding: 20px; width: 90%; max-width: 360px;
+      text-align: center;
+    }
+    #compare-box h3 { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+    #compare-panels { display: flex; gap: 12px; margin-bottom: 16px; }
+    .cmp-panel { flex: 1; }
+    .cmp-panel label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 4px; }
+    .cmp-panel canvas, .cmp-panel .cmp-ref {
+      width: 100%; aspect-ratio: 1; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px;
+    }
+    #compare-score {
+      font-size: 28px; font-weight: 700; margin-bottom: 6px;
+    }
+    #compare-msg { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+    #compare-actions { display: flex; gap: 8px; }
+    #compare-actions button {
+      flex: 1; padding: 10px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg2);
+      font-size: 13px; color: var(--text2); cursor: pointer;
+    }
+    #compare-actions .btn-next {
+      background: var(--purple); color: white; border-color: var(--purple);
+    }
+
+    /* ── Ordre des traits ── */
+    #stroke-order {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      justify-content: center; padding: 4px 0;
+    }
+    .stroke-step {
+      width: 44px; height: 44px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--bg2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; position: relative; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .stroke-step .step-num {
+      position: absolute; top: 2px; left: 4px;
+      font-size: 9px; color: var(--purple); font-weight: 700;
+    }
+    .stroke-step.active { border-color: var(--purple); background: var(--purple-light); }
+  </style>
+</head>
+<body>
+<div id="trace-app">
+
+  <!-- Header -->
+  <div id="trace-header">
+    <a href="index.html">←</a>
+    <h1>Tracé des kanas</h1>
+    <div id="romaji-display">—</div>
+    <div id="kana-display">あ</div>
+  </div>
+
+  <!-- Sélecteur horizontal -->
+  <div id="kana-selector"></div>
+
+  <!-- Zone principale -->
+  <div id="trace-main">
+    <div id="panels">
+
+      <!-- Référence -->
+      <div class="panel">
+        <div class="panel-label">Référence</div>
+        <div class="panel-body" id="ref-panel">
+          <div id="ref-big-kana">あ</div>
+        </div>
+      </div>
+
+      <!-- Canvas tracé -->
+      <div class="panel">
+        <div class="panel-label">Ton tracé</div>
+        <div class="panel-body" id="canvas-panel">
+          <div id="canvas-kana-ghost"></div>
+          <canvas id="draw-canvas"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Contrôles -->
+    <div id="trace-controls">
+      <button class="ctrl-btn danger" onclick="clearCanvas()">✕ Effacer</button>
+      <button class="ctrl-btn" onclick="prevKana()">← Préc.</button>
+      <button class="ctrl-btn" onclick="nextKana()">Suiv. →</button>
+      <button class="ctrl-btn primary" onclick="showCompare()">Comparer</button>
+    </div>
+  </div>
+
+  <!-- Overlay comparaison -->
+  <div id="compare-overlay">
+    <div id="compare-box">
+      <h3 id="compare-kana-title">Comparaison — あ</h3>
+      <div id="compare-panels">
+        <div class="cmp-panel">
+          <label>Référence</label>
+          <div class="cmp-ref" id="cmp-ref-char"></div>
+        </div>
+        <div class="cmp-panel">
+          <label>Ton tracé</label>
+          <canvas id="cmp-canvas" width="140" height="140" style="border-radius:10px;border:1px solid var(--border);background:var(--bg2);width:100%;aspect-ratio:1;"></canvas>
+        </div>
+      </div>
+      <div id="compare-score"></div>
+      <div id="compare-msg"></div>
+      <div id="compare-actions">
+        <button onclick="closeCompare()">← Continuer</button>
+        <button class="btn-next" onclick="nextKanaFromCompare()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="data.js"></script>
+<script>
+// ── Données ──
+const ALL_KANAS = [];
+COLS.forEach(col => {
+  if (col.label === 'SEP' || col.label === 'SEP2') return;
+  col.s.forEach(v => { if (v) ALL_KANAS.push(v); });
+});
+
+let currentIdx = 0;
+let isDrawing = false;
+let strokes = []; // tableau de traits [{points:[]}]
+let currentStroke = null;
+
+// ── Canvas setup ──
+const canvas = document.getElementById('draw-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const panel = document.getElementById('canvas-panel');
+  const rect = panel.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  redraw();
+}
+
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = Math.max(4, canvas.width * 0.025);
+
+  strokes.forEach(stroke => {
+    if (stroke.points.length < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+    stroke.points.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+  });
+
+  if (currentStroke && currentStroke.points.length > 1) {
+    ctx.beginPath();
+    ctx.moveTo(currentStroke.points[0].x, currentStroke.points[0].y);
+    currentStroke.points.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+  }
+}
+
+function getPos(e, isTouch) {
+  const rect = canvas.getBoundingClientRect();
+  const src = isTouch ? e.touches[0] : e;
+  return {
+    x: src.clientX - rect.left,
+    y: src.clientY - rect.top
+  };
+}
+
+// Mouse
+canvas.addEventListener('mousedown', e => {
+  isDrawing = true;
+  currentStroke = { points: [getPos(e, false)] };
+});
+canvas.addEventListener('mousemove', e => {
+  if (!isDrawing) return;
+  currentStroke.points.push(getPos(e, false));
+  redraw();
+});
+canvas.addEventListener('mouseup', () => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  if (currentStroke) strokes.push(currentStroke);
+  currentStroke = null;
+  redraw();
+});
+
+// Touch
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  isDrawing = true;
+  currentStroke = { points: [getPos(e, true)] };
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!isDrawing) return;
+  currentStroke.points.push(getPos(e, true));
+  redraw();
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (!isDrawing) return;
+  isDrawing = false;
+  if (currentStroke) strokes.push(currentStroke);
+  currentStroke = null;
+  redraw();
+}, { passive: false });
+
+function clearCanvas() {
+  strokes = [];
+  currentStroke = null;
+  redraw();
+}
+
+// ── Navigation ──
+function selectKana(idx) {
+  currentIdx = idx;
+  const romaji = ALL_KANAS[idx];
+  const hChar = H[romaji] || '';
+  const kChar = K[romaji] || '';
+
+  document.getElementById('kana-display').textContent = hChar || kChar;
+  document.getElementById('romaji-display').textContent = romaji;
+  document.getElementById('ref-big-kana').textContent = hChar || kChar;
+  document.getElementById('canvas-kana-ghost').textContent = hChar || kChar;
+
+  // Mettre à jour les pills
+  document.querySelectorAll('.kana-pill').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+
+  clearCanvas();
+}
+
+function nextKana() {
+  selectKana((currentIdx + 1) % ALL_KANAS.length);
+}
+function prevKana() {
+  selectKana((currentIdx - 1 + ALL_KANAS.length) % ALL_KANAS.length);
+}
+function nextKanaFromCompare() {
+  closeCompare();
+  nextKana();
+}
+
+// ── Comparaison ──
+function showCompare() {
+  if (strokes.length === 0) {
+    alert('Trace le kana d\'abord !');
+    return;
+  }
+
+  const romaji = ALL_KANAS[currentIdx];
+  const char = H[romaji] || K[romaji] || '';
+
+  document.getElementById('compare-kana-title').textContent = 'Comparaison — ' + char + ' (' + romaji + ')';
+  document.getElementById('cmp-ref-char').textContent = char;
+  document.getElementById('cmp-ref-char').style.fontSize = '80px';
+
+  // Copier le tracé dans le canvas de comparaison
+  const cmpCanvas = document.getElementById('cmp-canvas');
+  const cmpCtx = cmpCanvas.getContext('2d');
+  cmpCtx.clearRect(0, 0, 140, 140);
+
+  // Calculer le bounding box du tracé
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  strokes.forEach(s => s.points.forEach(p => {
+    minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+  }));
+
+  const scaleX = 110 / (maxX - minX || 1);
+  const scaleY = 110 / (maxY - minY || 1);
+  const scale = Math.min(scaleX, scaleY, 1.5);
+  const offX = (140 - (maxX - minX) * scale) / 2 - minX * scale;
+  const offY = (140 - (maxY - minY) * scale) / 2 - minY * scale;
+
+  cmpCtx.lineCap = 'round';
+  cmpCtx.lineJoin = 'round';
+  cmpCtx.strokeStyle = '#1a1a1a';
+  cmpCtx.lineWidth = 5;
+
+  strokes.forEach(stroke => {
+    if (stroke.points.length < 2) return;
+    cmpCtx.beginPath();
+    cmpCtx.moveTo(stroke.points[0].x * scale + offX, stroke.points[0].y * scale + offY);
+    stroke.points.forEach(p => cmpCtx.lineTo(p.x * scale + offX, p.y * scale + offY));
+    cmpCtx.stroke();
+  });
+
+  // Score basique : nombre de traits
+  const nStrokes = strokes.length;
+  const msgs = [
+    { max: 0, score: '—', msg: 'Rien tracé !' },
+    { max: 1, score: '⭐', msg: 'Continue à pratiquer !' },
+    { max: 3, score: '⭐⭐', msg: 'Bien essayé !' },
+    { max: 99, score: '⭐⭐⭐', msg: 'Beau tracé !' },
+  ];
+  const result = msgs.find(m => nStrokes <= m.max) || msgs[msgs.length - 1];
+  document.getElementById('compare-score').textContent = result.score;
+  document.getElementById('compare-msg').textContent = result.msg + ' (' + nStrokes + ' trait' + (nStrokes > 1 ? 's' : '') + ')';
+
+  document.getElementById('compare-overlay').classList.add('show');
+}
+
+function closeCompare() {
+  document.getElementById('compare-overlay').classList.remove('show');
+}
+
+// ── Sélecteur ──
+function buildSelector() {
+  const sel = document.getElementById('kana-selector');
+  sel.innerHTML = '';
+
+  COLS.forEach(col => {
+    if (col.label === 'SEP' || col.label === 'SEP2') return;
+    const group = document.createElement('div');
+    group.className = 'kana-group';
+    const lbl = document.createElement('div');
+    lbl.className = 'kana-group-label';
+    lbl.textContent = col.label;
+    group.appendChild(lbl);
+    const pills = document.createElement('div');
+    pills.className = 'kana-pills';
+    col.s.forEach(v => {
+      if (!v) { const sp = document.createElement('div'); sp.style.width='36px'; pills.appendChild(sp); return; }
+      const idx = ALL_KANAS.indexOf(v);
+      const pill = document.createElement('div');
+      pill.className = 'kana-pill';
+      pill.innerHTML = (H[v] || K[v] || '') + '<span>' + v + '</span>';
+      pill.dataset.idx = idx;
+      pill.addEventListener('click', () => selectKana(idx));
+      pills.appendChild(pill);
+    });
+    group.appendChild(pills);
+    sel.appendChild(group);
+  });
+}
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', () => {
+  buildSelector();
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    selectKana(0);
+  });
+});
+window.addEventListener('resize', resizeCanvas);
+</script>
+</body>
+</html>

@@ -42,11 +42,27 @@ function buildFullDeck() {
   return shuffle(cards);
 }
 
+// ── Calcul dynamique de la taille des cellules ──
+function calcCellSize() {
+  const zone = document.getElementById('grid-zone');
+  const zoneH = zone.getBoundingClientRect().height;
+  const ROWS = 5;
+  const HDR = 26;      // col-hdr
+  const PADDING = 16;  // padding grid-scroll haut+bas
+  const GAP = 4;       // gap * (ROWS-1)
+  const available = zoneH - HDR - PADDING - (GAP * (ROWS - 1));
+  const size = Math.floor(available / ROWS);
+  return Math.max(52, size);
+}
+
 // ── Grille ──
 function buildGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   cells = {};
+
+  const cellSize = calcCellSize();
+  document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
 
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') {
@@ -333,4 +349,13 @@ function resetGame() {
   document.getElementById('feedback').style.display = 'none';
 }
 
-document.addEventListener('DOMContentLoaded', () => resetGame());
+document.addEventListener('DOMContentLoaded', () => {
+  // Attendre que le layout soit calculé avant de mesurer les hauteurs
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => resetGame());
+  });
+});
+window.addEventListener('resize', () => {
+  document.documentElement.style.setProperty('--cell-size', calcCellSize() + 'px');
+  buildGrid();
+});
