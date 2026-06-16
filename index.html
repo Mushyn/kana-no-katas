@@ -31,6 +31,27 @@
     <span class="sp sp-retry" id="s-retry" style="display:none">↺ 0</span>
   </div>
 
+
+  <!-- Sélecteur de colonnes -->
+  <div id="col-selector-bar">
+    <button id="col-selector-btn" onclick="toggleColSelector()">
+      <span id="col-selector-label">Colonnes : toutes</span> ▾
+    </button>
+  </div>
+
+  <!-- Panneau de sélection (masqué par défaut) -->
+  <div id="col-selector-panel" style="display:none;">
+    <div id="col-selector-header">
+      <span>Choisir les colonnes</span>
+      <div style="display:flex;gap:6px;">
+        <button onclick="selectAllCols()">Toutes</button>
+        <button onclick="selectNoneCols()">Aucune</button>
+        <button class="btn-apply" onclick="applyColSelection()">Appliquer ✓</button>
+      </div>
+    </div>
+    <div id="col-checkboxes"></div>
+  </div>
+
   <div id="grid-zone">
     <div id="grid-scroll">
       <div id="grid"></div>

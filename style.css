@@ -24,11 +24,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1a1a2e; --bg2: #23233a; --bg3: #2d2d48;
-    --text: #e8e8f0; --text2: #9999bb; --text3: #ddddee;
-    --border: #333355; --kana-color: #c8c4ff; --romaji-color: #e8e8f0;
-    --purple-light: #2a2860; --green-light: #1a2e0a;
-    --red-light: #2e0a0a; --amber-light: #2e1a04;
+    --bg: #1c1c1e; --bg2: #2c2c2e; --bg3: #3a3a3c;
+    --text: #f2f2f7; --text2: #ebebf5cc; --text3: #333344;
+    --border: #48484a;
+    --kana-color: #f2f2f7;
+    --romaji-color: #ebebf5;
+    --purple: #9d97f5; --purple-light: #2a2860;
+    --green: #4cd964; --green-light: #1a3a1a;
+    --red: #ff6b6b; --red-light: #3a1a1a;
+    --amber: #ffa500; --amber-light: #3a2a00;
   }
 }
 }
@@ -48,6 +52,8 @@ body {
   display: flex; flex-direction: column;
   height: 100dvh;
   max-width: 680px; margin: 0 auto;
+  padding-top: env(safe-area-inset-top, 0px);
+  position: relative;
 }
 
 /* ── Header ── */
@@ -84,6 +90,7 @@ body {
 #grid-zone {
   flex: 1 1 0; overflow: hidden; min-height: 0;
   background: var(--bg2); position: relative;
+  margin-top: env(safe-area-inset-top, 0px);
 }
 #grid-scroll {
   width: 100%; height: 100%;
@@ -150,9 +157,10 @@ body {
 
 /* ── Zone cartes 34% ── */
 #card-zone {
-  flex: 0 0 27%; display: flex; flex-direction: column;
+  flex: 0 0 33dvh; display: flex; flex-direction: column;
   background: var(--bg); border-top: 1px solid var(--border);
-  overflow: hidden; min-height: 130px; max-height: 200px;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 #deck-controls {
@@ -262,3 +270,50 @@ body {
   border: 1px solid var(--border); background: var(--bg2);
   color: var(--text2); cursor: pointer; font-size: 16px; margin-top: 6px;
 }
+
+/* ── Sélecteur de colonnes ── */
+#col-selector-bar {
+  flex-shrink: 0;
+  padding: 4px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+#col-selector-btn {
+  font-size: 13px; color: var(--text2);
+  background: none; border: none; cursor: pointer;
+  padding: 2px 0; display: flex; align-items: center; gap: 6px;
+}
+#col-selector-panel {
+  position: absolute; left: 0; right: 0;
+  background: var(--bg);
+  border-bottom: 2px solid var(--purple);
+  z-index: 100; padding: 10px 14px 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+#col-selector-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; font-size: 13px; font-weight: 600; color: var(--text);
+}
+#col-selector-header button {
+  font-size: 11px; padding: 3px 8px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--text2); cursor: pointer;
+}
+#col-selector-header .btn-apply {
+  background: var(--purple); color: white; border-color: var(--purple);
+}
+#col-checkboxes {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.col-check {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg2);
+  cursor: pointer; font-size: 13px; color: var(--text2);
+  user-select: none; transition: all 0.12s;
+}
+.col-check.checked {
+  background: var(--purple-light); border-color: var(--purple);
+  color: var(--purple);
+}
+.col-check .col-check-kana { font-size: 16px; }

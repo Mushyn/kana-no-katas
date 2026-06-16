@@ -1,5 +1,6 @@
 // ── État global ──
 let mode = 'both';
+let selectedCols = null; // null = toutes les colonnes
 let showDiacritics = false; // dakuten + handakuten
 let deckSize = 1;
 let showRomaji = false;
@@ -40,6 +41,7 @@ function buildFullDeck() {
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') return;
     if (!showDiacritics && col.diacritic) return;
+    if (selectedCols && !selectedCols.includes(col.label + (col.diacritic ? col.s[0] : ''))) return;
     col.s.forEach(v => {
       if (!v) return;
       if (mode === 'both' || mode === 'hiragana')
@@ -83,6 +85,7 @@ function buildGrid() {
       return;
     }
     if (!showDiacritics && col.diacritic) return;
+    if (selectedCols && !selectedCols.includes(col.label + (col.diacritic ? col.s[0] : ''))) return;
     const colEl = document.createElement('div');
     colEl.className = 'kana-col';
 
@@ -371,3 +374,49 @@ window.addEventListener('resize', () => {
   document.documentElement.style.setProperty('--cell-size', calcCellSize() + 'px');
   buildGrid();
 });
+
+// ── Sélecteur de colonnes ──
+function buildColSelector() {
+  const container = document.getElementById('col-checkboxes');
+  if (!container) return;
+  container.innerHTML = '';
+  COLS.forEach(col => {
+    if (col.label === 'SEP' || col.label === 'SEP2') return;
+    if (!showDiacritics && col.diacritic) return;
+    const key = col.label + (col.diacritic ? col.s[0] : '');
+    const firstKana = col.s.find(v => v);
+    const char = (mode === 'katakana' ? K[firstKana] : H[firstKana]) || firstKana || '';
+    const isChecked = !selectedCols || selectedCols.includes(key);
+    const el = document.createElement('div');
+    el.className = 'col-check' + (isChecked ? ' checked' : '');
+    el.dataset.key = key;
+    el.innerHTML = `<span class="col-check-kana">${char}</span><span>${col.label}</span>`;
+    el.addEventListener('click', () => el.classList.toggle('checked'));
+    container.appendChild(el);
+  });
+}
+
+function toggleColSelector() {
+  const panel = document.getElementById('col-selector-panel');
+  const isOpen = panel.style.display !== 'none';
+  if (!isOpen) buildColSelector();
+  panel.style.display = isOpen ? 'none' : 'block';
+}
+
+function selectAllCols() {
+  document.querySelectorAll('.col-check').forEach(el => el.classList.add('checked'));
+}
+
+function selectNoneCols() {
+  document.querySelectorAll('.col-check').forEach(el => el.classList.remove('checked'));
+}
+
+function applyColSelection() {
+  const allChecks = document.querySelectorAll('.col-check');
+  const checked = [...document.querySelectorAll('.col-check.checked')].map(el => el.dataset.key);
+  selectedCols = checked.length === allChecks.length ? null : checked;
+  const label = document.getElementById('col-selector-label');
+  label.textContent = selectedCols ? `Colonnes : ${checked.length} sélectionnées` : 'Colonnes : toutes';
+  document.getElementById('col-selector-panel').style.display = 'none';
+  resetGame();
+}
