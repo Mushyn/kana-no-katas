@@ -259,12 +259,29 @@ function handleDrop(cell, cardId) {
     errorMap[card.id] = { card, count: card.errors };
     cell.classList.add('wrong');
     setTimeout(() => cell.classList.remove('wrong'), 400);
+
+    // 1. Retirer de activeDeck ET de fullDeck immédiatement
+    activeDeck.splice(idx, 1);
+    fullDeck = fullDeck.filter(c => c.id !== card.id);
+    selectedCard = null;
+    document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+    renderDeck(); // deck sans la carte ratée
+
+    // 2. Afficher feedback + highlight case correcte
     showFeedback(card);
     const cc = cells[card.romaji];
-    if (cc) { cc.classList.add('highlight'); setTimeout(() => cc.classList.remove('highlight'), 2400); }
-    activeDeck.splice(idx, 1);
-    const at = Math.min(idx + 13 + Math.floor(Math.random() * 5), activeDeck.length);
-    activeDeck.splice(at, 0, card);
+    if (cc) { cc.classList.add('highlight'); setTimeout(() => cc.classList.remove('highlight'), 3200); }
+
+    // 3. Après 3.5s : réinsérer en fin de fullDeck, mélanger, piocher
+    setTimeout(() => {
+      fullDeck.push(card);
+      for (let i = fullDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [fullDeck[i], fullDeck[j]] = [fullDeck[j], fullDeck[i]];
+      }
+      drawMore();
+    }, 3500);
+    return;
   }
   renderDeck();
 }
@@ -276,7 +293,7 @@ function showFeedback(card) {
   document.getElementById('fb-romaji').textContent = card.romaji;
   document.getElementById('fb-col').textContent = 'colonne « ' + colLabelFor(card.romaji) + ' » — ' + card.romaji;
   document.getElementById('feedback').style.display = 'block';
-  setTimeout(() => { document.getElementById('feedback').style.display = 'none'; locked = false; }, 2000);
+  setTimeout(() => { document.getElementById('feedback').style.display = 'none'; locked = false; }, 3500);
 }
 
 function showMsg(text, type) {
