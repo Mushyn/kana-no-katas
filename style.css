@@ -157,10 +157,10 @@ body {
 
 /* ── Zone cartes 34% ── */
 #card-zone {
-  flex: 0 0 33dvh; display: flex; flex-direction: column;
+  flex: 0 0 38%; display: flex; flex-direction: column;
   background: var(--bg); border-top: 1px solid var(--border);
   overflow: hidden;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
 }
 
 #deck-controls {
@@ -274,14 +274,15 @@ body {
 /* ── Sélecteur de colonnes ── */
 #col-selector-bar {
   flex-shrink: 0;
-  padding: 4px 14px;
+  padding: 8px 14px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 #col-selector-btn {
-  font-size: 13px; color: var(--text2);
-  background: none; border: none; cursor: pointer;
-  padding: 2px 0; display: flex; align-items: center; gap: 6px;
+  font-size: 15px; color: var(--purple); font-weight: 600;
+  background: var(--purple-light); border: 1px solid var(--purple);
+  border-radius: 20px; cursor: pointer;
+  padding: 6px 14px; display: flex; align-items: center; gap: 6px;
 }
 #col-selector-panel {
   position: absolute; left: 0; right: 0;
