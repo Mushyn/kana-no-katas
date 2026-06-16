@@ -78,7 +78,7 @@ body {
 #score-bar {
   display: flex; gap: 6px; padding: 6px 14px;
   background: var(--bg); border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+  flex-shrink: 0; align-items: center;
 }
 .sp { font-size: 15px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
 .sp-ok    { background: var(--green-light);  color: var(--green); }
@@ -272,17 +272,11 @@ body {
 }
 
 /* ── Sélecteur de colonnes ── */
-#col-selector-bar {
-  flex-shrink: 0;
-  padding: 8px 14px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
 #col-selector-btn {
-  font-size: 15px; color: var(--purple); font-weight: 600;
+  font-size: 12px; color: var(--purple); font-weight: 600;
   background: var(--purple-light); border: 1px solid var(--purple);
   border-radius: 20px; cursor: pointer;
-  padding: 6px 14px; display: flex; align-items: center; gap: 6px;
+  padding: 3px 10px; margin-left: auto;
 }
 #col-selector-panel {
   position: absolute; left: 0; right: 0;
