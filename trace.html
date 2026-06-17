@@ -80,7 +80,7 @@
     }
     #trace-controls button.primary { background: var(--purple); color: white; border-color: var(--purple); width: 64px; }
     #trace-controls button:hover { background: var(--purple-light); color: var(--purple); }
-    #trace-controls button.primary:hover { background: #6b63c9; color: white; }
+    #trace-controls button.primary:hover { background: #9333EA; color: white; }
 
     #trace-result {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -520,6 +520,7 @@ function afterValidation(isGood) {
 
 function skipKana() {
   if (tLocked || !tCurrentCard) return;
+  tFullDeck = tFullDeck.filter(c => c.id !== tCurrentCard.id);
   drawNextCard();
 }
 
@@ -637,7 +638,7 @@ function buildTColSelector() {
 
 function toggleColSelector() {
   const panel = document.getElementById('tcol-selector-panel');
-  const isOpen = panel.style.display !== 'none';
+  const isOpen = window.getComputedStyle(panel).display !== 'none';
   if (!isOpen) buildTColSelector();
   panel.style.display = isOpen ? 'none' : 'block';
 }

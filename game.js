@@ -247,7 +247,7 @@ function handleDrop(cell, cardId) {
     if (fullDeck.filter(c => c.romaji === romaji).length === 0) {
       cell.classList.add('correct'); successSet.add(romaji);
     } else {
-      cell.style.borderColor = '#63992299'; cell.style.background = 'var(--green-light)';
+      cell.style.borderColor = 'var(--green)'; cell.style.background = 'var(--green-light)';
     }
     showMsg('✓ ' + card.char + ' → ' + romaji, 'ok');
     if (activeDeck.length === 0 && fullDeck.length > 0) drawMore();
@@ -416,7 +416,7 @@ function buildColSelector() {
 
 function toggleColSelector() {
   const panel = document.getElementById('col-selector-panel');
-  const isOpen = panel.style.display !== 'none';
+  const isOpen = window.getComputedStyle(panel).display !== 'none';
   if (!isOpen) buildColSelector();
   panel.style.display = isOpen ? 'none' : 'block';
 }

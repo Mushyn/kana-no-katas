@@ -89,7 +89,7 @@ body {
 }
 .sp-ok    { background: var(--green-light);  color: var(--green); }
 .sp-err   { background: var(--red-light);    color: var(--red); }
-.sp-left  { background: var(--purple-light); color: #3C3489; }
+.sp-left  { background: var(--purple-light); color: var(--purple); }
 .sp-retry { background: var(--amber-light);  color: var(--amber); }
 
 /* ── Zone grille 66% ── */
@@ -151,13 +151,13 @@ body {
 }
 @keyframes pulse {
   0%,100% { border-color: var(--amber-mid); }
-  50%      { border-color: #BA7517; background: #ffd98a; }
+  50%      { border-color: var(--amber); background: var(--amber-light); }
 }
 
 /* ── Séparateur ── */
 #divider {
   flex-shrink: 0; height: 3px;
-  background: linear-gradient(90deg, var(--purple), #b8b4f0, var(--purple));
+  background: linear-gradient(90deg, var(--purple), #E0B3FF, var(--purple));
   opacity: 0.35;
 }
 
@@ -180,7 +180,7 @@ body {
   border: 1px solid var(--border); background: var(--bg2); color: var(--text2);
   cursor: pointer; transition: all 0.15s;
 }
-.dc-btn.active { background: #534AB7; color: white; border-color: #534AB7; }
+.dc-btn.active { background: var(--purple); color: white; border-color: var(--purple); }
 
 #btndiac { font-size: 18px; letter-spacing: 2px; padding: 4px 12px; line-height: 1; }
 
@@ -207,8 +207,8 @@ body {
 }
 .card:active            { transform: scale(1.1); }
 .card.retry-card        { border-color: var(--amber-mid); background: var(--amber-light); }
-.card.flipped           { font-size: 19px; font-weight: 600; color: #3C3489; background: var(--purple-light); border-color: var(--purple); }
-.card.selected          { border: 2px solid var(--purple); background: var(--purple-light); box-shadow: 0 0 0 3px #c5c2f5; }
+.card.flipped           { font-size: 19px; font-weight: 600; color: var(--purple); background: var(--purple-light); border-color: var(--purple); }
+.card.selected          { border: 2px solid var(--purple); background: var(--purple-light); box-shadow: 0 0 0 3px #E8C5FF; }
 .card.dragging          { opacity: 0.3; }
 .card .card-romaji      { font-size: 13px; color: var(--text3); margin-top: 2px; }
 
@@ -247,7 +247,7 @@ body {
   box-shadow: 0 12px 40px rgba(0,0,0,0.18);
 }
 .fb-char   { font-size: 70px; line-height: 1.1; }
-.fb-romaji { font-size: 27px; font-weight: 700; color: #3C3489; margin: 6px 0 3px; }
+.fb-romaji { font-size: 27px; font-weight: 700; color: var(--purple); margin: 6px 0 3px; }
 .fb-col    { font-size: 16px; color: var(--text2); }
 .fb-msg    { font-size: 15px; color: var(--amber); margin-top: 8px; }
 
@@ -264,7 +264,7 @@ body {
 .bstat .lbl { font-size: 15px; color: var(--text2); margin-top: 2px; }
 .bstat.ok  .val { color: var(--green); }
 .bstat.err .val { color: var(--red); }
-.bstat.pct .val { color: #3C3489; }
+.bstat.pct .val { color: var(--purple); }
 .bilan-section { margin-bottom: 16px; }
 .bilan-section h3 { font-size: 16px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
 .bilan-grid { display: flex; flex-wrap: wrap; gap: 6px; }
