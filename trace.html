@@ -193,11 +193,36 @@
     }
     #trace-bilan .primary { background: var(--purple); color: white; border-color: var(--purple); }
 
+    #score-help-btn {
+      font-size: 13px; font-weight: 700; color: var(--text2);
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 50%; cursor: pointer; width: 22px; height: 22px;
+      flex-shrink: 0; margin-left: auto;
+      display: flex; align-items: center; justify-content: center; padding: 0;
+    }
+    #score-help-panel {
+      display: none; position: absolute; left: 0; right: 0; top: 100%;
+      background: var(--bg); border-bottom: 2px solid var(--purple);
+      z-index: 100; padding: 12px 14px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    #score-help-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; font-size: 13px; font-weight: 600; color: var(--text);
+    }
+    #score-help-header button {
+      font-size: 11px; padding: 3px 8px; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer;
+    }
+    .score-help-row {
+      font-size: 12.5px; color: var(--text2); line-height: 1.5; margin-bottom: 8px;
+      display: flex; gap: 8px; align-items: flex-start;
+    }
+    .score-help-row .sp { flex-shrink: 0; }
     #tcol-selector-btn {
       font-size: clamp(10px, 3vw, 12px); color: var(--purple); font-weight: 600;
       background: var(--purple-light); border: 1px solid var(--purple);
       border-radius: 20px; cursor: pointer; padding: 3px clamp(6px, 2vw, 10px);
-      margin-left: auto; flex-shrink: 1; min-width: 0;
+      flex-shrink: 1; min-width: 0;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw;
     }
     #tcol-selector-panel {
@@ -255,7 +280,19 @@
     <span class="sp sp-err" id="t-err">✗ 0</span>
     <span class="sp sp-left" id="t-left">◎ 0</span>
     <span class="sp sp-retry" id="t-retry" style="display:none">↺ 0</span>
+    <button id="score-help-btn" onclick="toggleScoreHelp()" aria-label="Explication des scores" title="Explication des scores">?</button>
     <button id="tcol-selector-btn" onclick="toggleColSelector()"><span id="tcol-selector-label">Colonnes ▾</span></button>
+
+    <div id="score-help-panel">
+      <div id="score-help-header">
+        <span>Que veulent dire ces badges ?</span>
+        <button onclick="toggleScoreHelp()">Fermer ✕</button>
+      </div>
+      <div class="score-help-row"><span class="sp sp-ok">✓</span> Nombre total de cartes réussies (score ≥ 60%), même après plusieurs essais.</div>
+      <div class="score-help-row"><span class="sp sp-err">✗</span> Nombre total de tentatives ratées (une même carte peut compter plusieurs fois si elle échoue plus d'une fois avant d'être réussie).</div>
+      <div class="score-help-row"><span class="sp sp-left">◎</span> Nombre de cartes encore à traiter dans le tirage en cours.</div>
+      <div class="score-help-row"><span class="sp sp-retry">↺</span> Nombre de cartes distinctes ayant eu au moins une erreur depuis le début du tirage.</div>
+    </div>
 
     <div id="tcol-selector-panel">
       <div id="tcol-selector-header">
@@ -422,10 +459,16 @@ function resizeRefSquare() {
   charEl.style.height = maxSquareSide + 'px';
 }
 
+// Lit la couleur d'encre du tracé depuis la variable CSS --ink, pour s'adapter
+// automatiquement au thème clair/sombre (gris foncé en clair, gris clair en sombre).
+function getInkColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#3a3a40';
+}
+
 function redraw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.strokeStyle = '#1a1a1a';
+  ctx.strokeStyle = getInkColor();
   ctx.lineWidth = Math.max(4, canvas.width * 0.02);
   [...userStrokes, currentStroke].forEach(s => {
     if (!s || s.points.length < 2) return;
@@ -602,7 +645,7 @@ function showTraceResult(pct, orderOk, isGood) {
   trCtx.clearRect(0,0,160,160);
   const norm = normalizeStrokes(userStrokes);
   trCtx.lineCap = 'round'; trCtx.lineJoin = 'round';
-  trCtx.strokeStyle = '#1a1a1a'; trCtx.lineWidth = 4;
+  trCtx.strokeStyle = getInkColor(); trCtx.lineWidth = 4;
   norm.forEach(stroke => {
     if (stroke.length < 2) return;
     trCtx.beginPath();
@@ -819,9 +862,19 @@ function buildTColSelector() {
   });
 }
 
+function toggleScoreHelp() {
+  const panel = document.getElementById('score-help-panel');
+  const isOpen = window.getComputedStyle(panel).display !== 'none';
+  // Fermer le sélecteur de colonnes s'il était ouvert, pour éviter que les deux
+  // panneaux ne se superposent au même endroit.
+  document.getElementById('tcol-selector-panel').style.display = 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+}
+
 function toggleColSelector() {
   const panel = document.getElementById('tcol-selector-panel');
   const isOpen = window.getComputedStyle(panel).display !== 'none';
+  document.getElementById('score-help-panel').style.display = 'none';
   if (!isOpen) buildTColSelector();
   panel.style.display = isOpen ? 'none' : 'block';
 }
