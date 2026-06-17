@@ -26,11 +26,18 @@
     #trace-mode-toggle { display: flex; gap: 3px; }
 
     #trace-romaji-bar {
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
       padding: 6px 14px; background: var(--bg); border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
     #trace-romaji-label { font-size: 13px; color: var(--text2); font-weight: 500; }
+    #trace-length-selector { display: flex; gap: 4px; margin-left: auto; }
+    .tl-btn {
+      font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 14px;
+      border: 1px solid var(--border); background: var(--bg2); color: var(--text2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .tl-btn.active { background: var(--purple); color: white; border-color: var(--purple); }
     #trace-romaji-toggle {
       width: 44px; height: 24px; border-radius: 14px; border: none;
       background: var(--border); cursor: pointer; position: relative;
@@ -203,6 +210,12 @@
       <span class="rt-knob"></span>
     </button>
     <span id="trace-romaji-state">off</span>
+    <div id="trace-length-selector">
+      <button class="tl-btn" data-len="10" onclick="setSessionLength(10,this)">10</button>
+      <button class="tl-btn active" data-len="20" onclick="setSessionLength(20,this)">20</button>
+      <button class="tl-btn" data-len="30" onclick="setSessionLength(30,this)">30</button>
+      <button class="tl-btn" data-len="0" onclick="setSessionLength(0,this)">Tout</button>
+    </div>
   </div>
 
   <div id="trace-score-bar">
@@ -299,6 +312,7 @@ let tResultsLog = [];
 let tLocked = false;
 let tRomajiForced = false;     // bouton "Mode romaji" : force 100% des cartes en romaji
 const ROMAJI_RANDOM_RATE = 0.3; // 30% de chance qu'une carte demande le romaji, hors mode forcé
+let tSessionLength = 20;        // 0 = pas de limite (toutes les cartes des colonnes choisies)
 
 const TRACEABLE_COLS = COLS.filter(c => c.label !== 'SEP' && c.label !== 'SEP2' && !c.diacritic);
 
@@ -320,7 +334,11 @@ function buildTraceableDeck() {
       cards.push({ romaji: v, errors: 0, id: folder + '-' + v, showRomaji });
     });
   });
-  return shuffle(cards);
+  const shuffled = shuffle(cards);
+  if (tSessionLength > 0 && shuffled.length > tSessionLength) {
+    return shuffled.slice(0, tSessionLength);
+  }
+  return shuffled;
 }
 
 function shuffle(arr) {
@@ -708,6 +726,13 @@ function toggleRomajiMode() {
   btn.classList.toggle('active', tRomajiForced);
   btn.setAttribute('aria-pressed', tRomajiForced ? 'true' : 'false');
   state.textContent = tRomajiForced ? 'on' : 'off';
+  resetTrace();
+}
+
+function setSessionLength(n, btn) {
+  tSessionLength = n;
+  document.querySelectorAll('.tl-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   resetTrace();
 }
 
