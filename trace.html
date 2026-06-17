@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Kana no Katas — Tracé</title>
-  <meta name="theme-color" content="#7F77DD" />
+  <meta name="theme-color" content="#A855F7" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -235,7 +235,7 @@
     <h2>Bilan du tracé</h2>
     <div id="trace-bilan-avg">
       <div class="val" id="tb-avg-val">0%</div>
-      <div class="lbl">Similitude moyenne</div>
+      <div class="lbl">Votre score !</div>
     </div>
     <div id="trace-histogram"></div>
     <button class="primary" onclick="closeTraceBilan()">← Continuer</button>
@@ -563,7 +563,7 @@ function showTraceBilan() {
   document.getElementById('tb-avg-val').textContent = avg + '%';
 
   const buckets = [0,0,0,0,0];
-  const bucketColors = ['var(--red)', '#e08a3c', 'var(--amber-mid)', '#7aa83c', 'var(--green)'];
+  const bucketColors = ['var(--red)', '#FF974D', 'var(--amber)', '#7CE85C', 'var(--green)'];
   const bucketLabels = ['<20%','20-40%','40-60%','60-80%','80-100%'];
   tResultsLog.forEach(r => {
     const idx = Math.min(4, Math.floor(r.pct / 20));
