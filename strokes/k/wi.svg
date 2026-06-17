@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="71.6 121.7 71.3 71.3" width="200" height="200">
+  <defs>
+    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="1.5" refY="1.5"
+            orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0,0 L 3,1.5 L 0,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect x="71.6" y="121.7" width="71.3" height="71.3" fill="#FAFAFA"/>
+  <g transform="">
+    <text x="96.811005" y="142.35658" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">1</text><path d="M 113.72697,139.44051 C 113.44571,139.51084 113.34413,139.76868 113.41447,140.19051 C 113.60195,140.56555 113.69569,141.28432 113.69572,142.34676 L 113.69572,148.25301 L 97.039463,148.25301 L 97.039463,152.22176 L 101.50822,152.22176 L 101.50822,162.87801 L 92.914463,162.87801 L 92.914463,166.84676 L 113.69572,166.84676 L 113.69572,178.81551 L 118.13322,178.81551 L 118.13322,166.84676 L 132.85197,166.84676 L 132.85197,162.87801 L 118.13322,162.87801 L 118.13322,152.22176 L 126.57072,152.22176 L 126.57072,148.25301 L 118.13322,148.25301 L 118.13322,141.44051 L 118.69572,140.40926 C 118.94569,140.06554 118.91443,139.81557 118.60197,139.65926 L 114.07072,139.44051 C 113.9379,139.42489 113.82072,139.41707 113.72697,139.44051 z M 105.85197,152.22176 L 113.69572,152.22176 L 113.69572,162.87801 L 105.85197,162.87801 L 105.85197,152.22176 z " fill="#1a1a1a" fill-opacity="0.55"/><path d="M 98.456976,144.85279 L 108.90876,144.85279" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><path d="M 95.80723,151.62436 L 95.512814,160.89848" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><path d="M 94.827686,170.14868 L 109.71282,170.35686" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="87.650917" y="157.03352" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">2</text><text x="94.729164" y="178.37236" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">3</text><path d="M 122.20385,135.06971 L 122.09976,145.68709" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="125.22807" y="142.98114" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">4</text>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="68.4 280.4 74.5 74.5" width="200" height="200">
+  <defs>
+    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="1.5" refY="1.5"
+            orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0,0 L 3,1.5 L 0,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect x="68.4" y="280.4" width="74.5" height="74.5" fill="#FAFAFA"/>
+  <g transform="">
+    <path d="M 91.466631,329.4101 L 109.32601,329.4101 L 109.32601,316.2851 C 109.32598,315.22262 109.23223,314.50387 109.04475,314.12885 C 108.98223,313.62887 109.18536,313.37887 109.65413,313.37885 L 113.91975,313.70698 C 114.41973,313.80075 114.51348,314.05075 114.20101,314.45698 L 113.68538,315.20698 L 113.68538,317.7851 C 117.9041,315.56637 120.7166,313.2695 122.12288,310.89448 L 97.747881,310.89448 C 97.529121,309.582 97.154121,308.332 96.622881,307.14448 L 96.622881,306.7226 L 124.51351,306.7226 L 124.65413,306.5351 C 124.77909,306.37888 124.91972,306.37888 125.07601,306.5351 C 125.85722,307.22263 126.91972,308.207 128.26351,309.48822 C 128.88846,309.92575 128.82596,310.3945 128.07601,310.89448 L 127.18538,311.31635 C 125.59159,314.22262 121.93535,317.66012 116.21663,321.62885 C 115.56035,320.37887 114.7166,319.25387 113.68538,318.25385 L 113.68538,329.4101 L 131.40413,329.4101 L 131.40413,333.58198 L 91.466631,333.58198 L 91.466631,329.4101" fill="#1a1a1a" fill-opacity="0.55"/><path d="M 96.568528,303.69036 L 108.7868,303.69036" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="95.386337" y="301.38467" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">1</text><path d="M 106.2778,314.83636 L 105.96552,325.8701" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="97.884544" y="322.30713" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">2</text><path d="M 91.392654,337.00793 L 104.50823,336.90384" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="85.809891" y="339.79456" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">3</text>
+  </g>
+</svg>

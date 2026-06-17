@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="265.4 116.9 68.7 68.7" width="200" height="200">
+  <defs>
+    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="1.5" refY="1.5"
+            orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0,0 L 3,1.5 L 0,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect x="265.4" y="116.9" width="68.7" height="68.7" fill="#FAFAFA"/>
+  <g transform="">
+    <path d="M 295.77332,139.59884 L 294.55457,143.59884 C 301.6483,144.56762 308.42953,146.47386 314.89832,149.31759 C 315.52329,147.69262 316.21078,146.31761 316.92957,145.19259 L 316.92957,144.91134 C 311.0233,142.94262 303.96079,141.16137 295.77332,139.59884 z M 295.58582,151.69259 L 294.46082,155.91134 C 300.86705,156.91136 307.14828,158.72385 313.30457,161.31759 C 314.05454,159.63011 314.77328,158.28635 315.46082,157.31759 L 315.46082,156.94259 C 309.27329,154.97386 302.64829,153.22386 295.58582,151.69259 z M 290.89832,163.69259 L 289.58582,168.38009 C 299.42955,169.88009 308.52328,172.84883 316.86707,177.25509 C 317.74203,175.34884 318.58578,173.75508 319.36707,172.47384 L 319.36707,172.09884 C 310.7733,168.66135 301.27329,165.84884 290.89832,163.69259 z " fill="#1a1a1a" fill-opacity="0.55"/><path d="M 298.11909,135.90245 C 302.67311,136.08461 308.99669,139.07725 312.58786,140.79477" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="291.71875" y="137.24438" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">1</text><path d="M 294.78815,147.56074 C 300.30502,147.24847 306.75871,150.47532 310.61011,152.55715" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="288.51093" y="149.85681" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">2</text><path d="M 292.18586,160.67631 C 297.91091,160.49415 304.28654,163.40873 307.17509,164.52771" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="286.01273" y="162.13965" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">3</text>
+  </g>
+</svg>

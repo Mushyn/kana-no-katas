@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="462.3 365.8 56.9 56.9" width="200" height="200">
+  <defs>
+    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="1.5" refY="1.5"
+            orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0,0 L 3,1.5 L 0,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect x="462.3" y="365.8" width="56.9" height="56.9" fill="#FAFAFA"/>
+  <g transform="">
+    <path d="M 494.20149,388.65125 C 500.13899,391.30752 505.56089,394.43251 510.46719,398.02625 L 510.46719,398.35437 C 509.52959,399.60438 508.60779,400.97938 507.70149,402.47937 C 502.45149,397.76064 497.46709,394.51064 492.74839,392.72937 L 492.74839,407.91687 C 492.74839,411.29187 492.81089,413.90124 492.93589,415.74499 L 488.01399,415.74499 C 488.20149,412.5575 488.29529,407.79188 488.29529,401.44812 L 488.29529,378.15125 C 488.29529,377.49503 488.20149,376.93253 488.01399,376.46375 C 487.82649,376.05753 487.95149,375.80753 488.38899,375.71375 L 493.12339,375.99499 C 493.49839,376.15128 493.52959,376.41691 493.21719,376.79187 L 492.74839,377.63562 L 492.74839,391.27625 L 494.20149,388.65125" fill="#1a1a1a" fill-opacity="0.55"/><path d="M 484.44352,377.39557 L 484.33943,393.11344" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="477.07367" y="384.65842" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">1</text><path d="M 498.18365,386.86793 L 509.63375,393.32163" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="501.53525" y="385.28296" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">2</text>
+  </g>
+</svg>

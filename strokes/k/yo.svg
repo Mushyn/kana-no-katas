@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="201.4 355.0 69.7 69.7" width="200" height="200">
+  <defs>
+    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="1.5" refY="1.5"
+            orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0,0 L 3,1.5 L 0,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect x="201.4" y="355.0" width="69.7" height="69.7" fill="#FAFAFA"/>
+  <g transform="">
+    <path d="M 255.16941,416.26032 L 250.71628,416.26032 L 250.71628,413.8697 L 226.10691,413.8697 L 226.10691,409.88532 L 250.71628,409.88532 L 250.71628,398.8697 L 228.54441,398.8697 L 228.54441,395.07282 L 250.71628,395.07282 L 250.71628,385.7447 L 226.10691,385.7447 L 226.10691,381.76032 L 255.16941,381.76032 L 255.16941,416.26032" fill="#1a1a1a" fill-opacity="0.55"/><path d="M 245.86498,377.81194 L 259.18874,377.81194 L 259.18874,388.22113" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="245.55255" y="375.47482" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">1</text><path d="M 226.99492,391.4264 L 244.95432,391.72081" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><path d="M 225.52285,406.44162 L 238.03554,406.44162" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="220.35126" y="393.65823" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">2</text><text x="219.3208" y="408.82071" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">3</text>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="262.1 356.3 74.7 74.7" width="200" height="200">
+  <defs>
+    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="1.5" refY="1.5"
+            orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 0,0 L 3,1.5 L 0,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect x="262.1" y="356.3" width="74.7" height="74.7" fill="#FAFAFA"/>
+  <g transform="">
+    <text x="289.06296" y="377.34848" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">1</text><path d="M 288.8774,383.83094 L 288.8774,387.79969 L 300.5024,387.79969 L 317.565,387.79969 L 317.565,383.83094 L 288.8774,383.83094 z M 300.5024,387.79969 C 300.065,387.89347 299.94,388.14346 300.1274,388.54969 C 300.315,389.01847 300.4087,389.58096 300.4087,390.23719 L 300.4087,396.20594 L 285.4087,396.20594 L 285.4087,400.17469 L 300.4087,400.17469 L 300.4087,407.54969 C 300.4087,412.64344 302.9087,415.17469 307.9087,415.17469 L 320.815,415.17469 L 321.4712,410.92469 L 307.5337,410.92469 C 305.7524,410.92469 304.8775,409.73719 304.8774,407.39344 L 304.8774,400.17469 L 323.94,400.17469 L 323.94,396.20594 L 304.8774,396.20594 L 304.8774,389.76844 L 305.44,388.89344 C 305.7212,388.51847 305.6899,388.26846 305.3462,388.17469 L 300.5024,387.79969 z " fill="#1a1a1a" fill-opacity="0.55"/><path d="M 289.79174,380.10196 L 309.15283,380.10196" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><path d="M 286.66899,392.59298 L 297.28636,392.59298" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="280.93271" y="393.86642" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">2</text><path d="M 296.77157,407.61929 C 296.66116,411.62151 296.57836,415.37531 297.74223,416.9785 C 298.90609,418.58169 304.03998,418.32869 308.62184,418.29188" class="stroke-order" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrowhead)"/><text x="290.05963" y="415.94766" font-size="9" font-family="sans-serif" font-weight="700" fill="#dc2626">3</text>
+  </g>
+</svg>

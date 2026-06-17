@@ -46,7 +46,12 @@
       flex: 1; display: flex; align-items: center; justify-content: center;
       overflow: hidden; padding: 4px;
     }
-    #ref-svg-img { max-width: 80%; max-height: 100%; object-fit: contain; }
+    #ref-char-display {
+      font-size: min(30vw, 30vh);
+      line-height: 1;
+      color: var(--text);
+      user-select: none;
+    }
 
     #trace-canvas-zone {
       flex: 1 1 0; display: flex; flex-direction: column;
@@ -79,7 +84,7 @@
 
     #trace-result {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: var(--bg); border: 2px solid var(--amber-mid);
+      background: var(--bg); border: 4px solid var(--amber-mid);
       border-radius: 18px; padding: 18px 24px; text-align: center; z-index: 500; min-width: 220px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.18);
     }
@@ -187,7 +192,7 @@
   <div id="trace-ref-zone">
     <div id="trace-ref-label">Référence — <span id="trace-ref-romaji"></span></div>
     <div id="trace-ref-body">
-      <img id="ref-svg-img" src="" alt="tracé de référence" />
+      <div id="ref-char-display"></div>
     </div>
   </div>
 
@@ -467,7 +472,8 @@ function showTraceResult(pct, orderOk, isGood) {
   tLocked = true;
   const result = document.getElementById('trace-result');
   result.className = isGood ? 'good' : 'bad';
-  document.getElementById('tr-ref-img').src = document.getElementById('ref-svg-img').src;
+  const folder = currentMode === 'katakana' ? 'k' : 'h';
+  document.getElementById('tr-ref-img').src = 'strokes/' + folder + '/' + tCurrentCard.romaji + '.svg';
 
   const trCanvas = document.getElementById('tr-user-canvas');
   trCanvas.width = 160; trCanvas.height = 160;
@@ -536,8 +542,8 @@ function drawNextCard() {
 }
 
 function loadReference(romaji) {
-  const folder = currentMode === 'katakana' ? 'k' : 'h';
-  document.getElementById('ref-svg-img').src = 'strokes/' + folder + '/' + romaji + '.svg';
+  const char = (currentMode === 'katakana' ? K[romaji] : H[romaji]) || romaji;
+  document.getElementById('ref-char-display').textContent = char;
   document.getElementById('trace-ref-romaji').textContent = romaji;
 }
 
