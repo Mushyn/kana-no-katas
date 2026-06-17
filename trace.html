@@ -96,11 +96,9 @@
     /* Carré de référence : carré strict, côté = 150% de la taille de police du kana (em),
        donc proportionnel au caractère affiché, pas à la taille de la zone englobante. */
     #ref-char-display {
-      font-size: min(30vw, 30vh);
       line-height: 1;
       color: var(--text);
       user-select: none;
-      width: 1.5em; height: 1.5em;
       display: flex; align-items: center; justify-content: center;
       box-sizing: border-box;
     }
@@ -406,6 +404,22 @@ function resizeCanvas() {
   canvas.width = rect.width;
   canvas.height = rect.height;
   redraw();
+}
+
+// Dimensionne le carré de référence (kana + grille) en JS plutôt qu'en vw/vh CSS :
+// la taille de police ne doit jamais dépasser ce que #trace-ref-body peut réellement
+// contenir, sous peine de déborder sur grand écran (le carré devenait un rectangle écrasé).
+function resizeRefSquare() {
+  const body = document.getElementById('trace-ref-body');
+  const bodyRect = body.getBoundingClientRect();
+  // Le carré fait 1.5x la taille de police ; on veut que ce carré tienne dans bodyRect
+  // avec une marge de 6%, donc font-size = (plus petit côté disponible / 1.5) * 0.94
+  const maxSquareSide = Math.min(bodyRect.width, bodyRect.height) * 0.94;
+  const fontSize = maxSquareSide / 1.5;
+  const charEl = document.getElementById('ref-char-display');
+  charEl.style.fontSize = fontSize + 'px';
+  charEl.style.width = maxSquareSide + 'px';
+  charEl.style.height = maxSquareSide + 'px';
 }
 
 function redraw() {
@@ -845,10 +859,11 @@ function init() {
   buildTColSelector();
   requestAnimationFrame(() => {
     resizeCanvas();
+    resizeRefSquare();
     resetTrace();
   });
 }
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', () => { resizeCanvas(); resizeRefSquare(); });
 </script>
 </body>
 </html>
