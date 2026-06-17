@@ -25,6 +25,26 @@
     #trace-header h1 { font-size: 15px; font-weight: 600; flex: 1; }
     #trace-mode-toggle { display: flex; gap: 3px; }
 
+    #trace-romaji-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px; background: var(--bg); border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #trace-romaji-label { font-size: 13px; color: var(--text2); font-weight: 500; }
+    #trace-romaji-toggle {
+      width: 44px; height: 24px; border-radius: 14px; border: none;
+      background: var(--border); cursor: pointer; position: relative;
+      transition: background 0.2s; flex-shrink: 0; padding: 0;
+    }
+    #trace-romaji-toggle.active { background: var(--purple); }
+    #trace-romaji-toggle .rt-knob {
+      position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+      border-radius: 50%; background: white; transition: left 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    #trace-romaji-toggle.active .rt-knob { left: 22px; }
+    #trace-romaji-state { font-size: 12px; color: var(--text2); font-weight: 600; min-width: 24px; }
+
     #trace-score-bar {
       display: flex; gap: clamp(3px, 1.5vw, 6px); padding: 6px clamp(8px, 3vw, 14px);
       background: var(--bg); border-bottom: 1px solid var(--border);
@@ -52,6 +72,13 @@
       color: var(--text);
       user-select: none;
     }
+    #ref-romaji-prompt {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; user-select: none; text-align: center;
+    }
+    #ref-romaji-prompt .rp-verb { font-size: clamp(14px, 4vw, 18px); color: var(--text2); font-weight: 500; }
+    #ref-romaji-prompt .rp-word { font-size: min(26vw, 26vh); line-height: 1; color: var(--text); font-weight: 700; }
+    #ref-romaji-prompt .rp-mode { font-size: clamp(14px, 4vw, 18px); color: var(--purple); font-weight: 700; }
 
     #trace-canvas-zone {
       flex: 1 1 0; display: flex; flex-direction: column;
@@ -81,6 +108,7 @@
     #trace-controls button.primary { background: var(--purple); color: white; border-color: var(--purple); width: 64px; }
     #trace-controls button:hover { background: var(--purple-light); color: var(--purple); }
     #trace-controls button.primary:hover { background: #9333EA; color: white; }
+    #trace-hint-btn { font-size: 18px; font-weight: 700; }
 
     #trace-result {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -169,6 +197,14 @@
     </div>
   </div>
 
+  <div id="trace-romaji-bar">
+    <span id="trace-romaji-label">Mode romaji</span>
+    <button id="trace-romaji-toggle" onclick="toggleRomajiMode()" aria-pressed="false">
+      <span class="rt-knob"></span>
+    </button>
+    <span id="trace-romaji-state">off</span>
+  </div>
+
   <div id="trace-score-bar">
     <span class="sp sp-ok" id="t-ok">✓ 0</span>
     <span class="sp sp-err" id="t-err">✗ 0</span>
@@ -193,6 +229,11 @@
     <div id="trace-ref-label">Référence — <span id="trace-ref-romaji"></span></div>
     <div id="trace-ref-body">
       <div id="ref-char-display"></div>
+      <div id="ref-romaji-prompt" style="display:none;">
+        <div class="rp-verb">Écris</div>
+        <div class="rp-word" id="rp-word"></div>
+        <div class="rp-mode" id="rp-mode"></div>
+      </div>
     </div>
   </div>
 
@@ -207,6 +248,7 @@
     <button onclick="clearCanvas()" aria-label="Effacer" title="Effacer">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
     </button>
+    <button id="trace-hint-btn" onclick="toggleCardHint()" aria-label="Aide" title="Afficher l'aide">A</button>
     <button onclick="validateTrace()" class="primary" aria-label="Valider" title="Valider le tracé">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </button>
@@ -255,6 +297,8 @@ let tScore = { ok: 0, err: 0 };
 let tErrorMap = {};
 let tResultsLog = [];
 let tLocked = false;
+let tRomajiForced = false;     // bouton "Mode romaji" : force 100% des cartes en romaji
+const ROMAJI_RANDOM_RATE = 0.3; // 30% de chance qu'une carte demande le romaji, hors mode forcé
 
 const TRACEABLE_COLS = COLS.filter(c => c.label !== 'SEP' && c.label !== 'SEP2' && !c.diacritic);
 
@@ -272,7 +316,8 @@ function buildTraceableDeck() {
       if (!v) return;
       const folder = currentMode === 'katakana' ? 'k' : 'h';
       if (!REF_STROKES[folder] || !REF_STROKES[folder][v]) return;
-      cards.push({ romaji: v, errors: 0, id: folder + '-' + v });
+      const showRomaji = tRomajiForced ? true : Math.random() < ROMAJI_RANDOM_RATE;
+      cards.push({ romaji: v, errors: 0, id: folder + '-' + v, showRomaji });
     });
   });
   return shuffle(cards);
@@ -543,9 +588,54 @@ function drawNextCard() {
 }
 
 function loadReference(romaji) {
-  const char = (currentMode === 'katakana' ? K[romaji] : H[romaji]) || romaji;
-  document.getElementById('ref-char-display').textContent = char;
   document.getElementById('trace-ref-romaji').textContent = romaji;
+  renderReferenceDisplay();
+}
+
+// Affiche soit le kana (silhouette texte), soit la consigne "Écris / Ku / en hiragana !"
+// selon tCurrentCard.showRomaji. Appelée à chaque nouvelle carte et à chaque bascule d'aide.
+function renderReferenceDisplay() {
+  if (!tCurrentCard) return;
+  const romaji = tCurrentCard.romaji;
+  const charEl = document.getElementById('ref-char-display');
+  const promptEl = document.getElementById('ref-romaji-prompt');
+
+  if (tCurrentCard.showRomaji) {
+    charEl.style.display = 'none';
+    promptEl.style.display = 'flex';
+    document.getElementById('rp-word').textContent = romaji.charAt(0).toUpperCase() + romaji.slice(1);
+    document.getElementById('rp-mode').textContent = currentMode === 'katakana' ? 'en katakana !' : 'en hiragana !';
+  } else {
+    promptEl.style.display = 'none';
+    charEl.style.display = '';
+    const char = (currentMode === 'katakana' ? K[romaji] : H[romaji]) || romaji;
+    charEl.textContent = char;
+  }
+  updateHintButton();
+}
+
+// Bouton d'aide (4e bouton des contrôles) : bascule l'affichage kana <-> romaji
+// pour la carte en cours seulement, sans changer la config tirée au hasard pour les suivantes.
+function toggleCardHint() {
+  if (!tCurrentCard || tLocked) return;
+  tCurrentCard.showRomaji = !tCurrentCard.showRomaji;
+  renderReferenceDisplay();
+}
+
+function updateHintButton() {
+  const btn = document.getElementById('trace-hint-btn');
+  if (!tCurrentCard) return;
+  if (tCurrentCard.showRomaji) {
+    // Romaji affiché -> le bouton propose de révéler le kana (icône A barré / lettres)
+    btn.textContent = currentMode === 'katakana' ? 'カ' : 'あ';
+    btn.title = 'Afficher le kana';
+    btn.setAttribute('aria-label', 'Afficher le kana');
+  } else {
+    // Kana affiché -> le bouton propose de révéler le romaji (icône A)
+    btn.textContent = 'A';
+    btn.title = 'Afficher le romaji';
+    btn.setAttribute('aria-label', 'Afficher le romaji');
+  }
 }
 
 function updateTraceScores() {
@@ -609,6 +699,16 @@ function resetTrace() {
   document.getElementById('trace-bilan').style.display = 'none';
   updateTraceScores();
   drawNextCard();
+}
+
+function toggleRomajiMode() {
+  tRomajiForced = !tRomajiForced;
+  const btn = document.getElementById('trace-romaji-toggle');
+  const state = document.getElementById('trace-romaji-state');
+  btn.classList.toggle('active', tRomajiForced);
+  btn.setAttribute('aria-pressed', tRomajiForced ? 'true' : 'false');
+  state.textContent = tRomajiForced ? 'on' : 'off';
+  resetTrace();
 }
 
 function setTraceMode(m, btn) {
