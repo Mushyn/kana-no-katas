@@ -356,3 +356,23 @@ body {
   color: var(--purple);
 }
 .col-check .col-check-kana { font-size: 16px; }
+
+/* ── Bannière de mise à jour PWA ── */
+#sw-update-banner {
+  display: none; align-items: center; justify-content: center; gap: 12px;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
+  padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: var(--purple); color: white;
+  font-size: 14px; font-weight: 600;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  animation: sw-banner-in 0.3s ease-out;
+}
+#sw-update-banner button {
+  background: white; color: var(--purple); border: none;
+  border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 700;
+  cursor: pointer; flex-shrink: 0;
+}
+@keyframes sw-banner-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

@@ -917,6 +917,48 @@ function init() {
   });
 }
 window.addEventListener('resize', () => { resizeCanvas(); resizeRefSquare(); });
+
+// ── Détection de mise à jour PWA (même mécanisme que index.html) ──
+let swRegistration = null;
+function showUpdateBanner() {
+  document.getElementById('sw-update-banner').style.display = 'flex';
+}
+function applySwUpdate() {
+  if (!swRegistration || !swRegistration.waiting) return;
+  swRegistration.waiting.postMessage('SKIP_WAITING');
+}
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => {
+        swRegistration = reg;
+        if (reg.waiting) showUpdateBanner();
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner();
+            }
+          });
+        });
+      })
+      .catch(e => console.warn('SW KO', e));
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
+    setInterval(() => { if (swRegistration) swRegistration.update(); }, 60 * 60 * 1000);
+  });
+}
 </script>
+<div id="sw-update-banner" style="display:none;">
+  <span>✨ Nouvelle version disponible</span>
+  <button onclick="applySwUpdate()">Mettre à jour</button>
+</div>
 </body>
 </html>

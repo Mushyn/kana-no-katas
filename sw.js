@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kana-no-katas-v38';
+const CACHE_NAME = 'kana-no-katas-v40';
 const ASSETS = [
   '/',
   '/index.html',
@@ -112,7 +112,15 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
+  // Pas de skipWaiting() automatique ici : on laisse le nouveau service worker
+  // en attente ('waiting') tant que l'utilisateur n'a pas explicitement validé
+  // la mise à jour via la bannière "Nouvelle version disponible". Voir le
+  // listener 'message' ci-dessous, déclenché par le bouton de la bannière.
+});
+
+// Permet à la page de déclencher l'activation du SW en attente sur action utilisateur
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // Activation : suppression des anciens caches
