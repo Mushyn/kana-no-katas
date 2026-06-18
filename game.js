@@ -22,8 +22,9 @@ function shuffle(arr) {
 
 function toggleDiacritics(btn) {
   showDiacritics = !showDiacritics;
-  btn.textContent = showDiacritics ? '゛゜ on' : '゛゜ off';
   btn.classList.toggle('active', showDiacritics);
+  btn.setAttribute('aria-pressed', showDiacritics ? 'true' : 'false');
+  document.getElementById('diac-switch-state').textContent = showDiacritics ? 'on' : 'off';
   resetGame();
 }
 
@@ -139,7 +140,7 @@ function renderDeck() {
 
   activeDeck.forEach(card => {
     const el = document.createElement('div');
-    el.className = 'card' + (card.errors > 0 ? ' retry-card' : '');
+    el.className = 'card' + (card.type === 'k' ? ' card-kata' : ' card-hira') + (card.errors > 0 ? ' retry-card' : '');
     el.id = 'card-' + card.id;
     el.draggable = true;
     el.dataset.flipped = '0';
@@ -242,7 +243,10 @@ function handleDrop(cell, cardId) {
 
     let cd = cell.querySelector('.chars');
     if (!cd) { cd = document.createElement('div'); cd.className = 'chars'; cell.insertBefore(cd, cell.firstChild); }
-    const s = document.createElement('span'); s.textContent = card.char; cd.appendChild(s);
+    const s = document.createElement('span');
+    s.textContent = card.char;
+    s.className = card.type === 'k' ? 'ch-kata' : 'ch-hira';
+    cd.appendChild(s);
 
     if (fullDeck.filter(c => c.romaji === romaji).length === 0) {
       cell.classList.add('correct'); successSet.add(romaji);

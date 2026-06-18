@@ -60,7 +60,13 @@
       <button class="dc-btn active" onclick="setDeckSize(1,this)">1/1</button>
       <button class="dc-btn" onclick="setDeckSize(5,this)">5/5</button>
       <button class="dc-btn" id="btnhint" onclick="toggleHints()">Romaji</button>
-      <button class="dc-btn" id="btndiac" onclick="toggleDiacritics(this)">゛゜ off</button>
+      <span id="diac-switch-group">
+        <span id="diac-switch-label">Diacritiques</span>
+        <button id="diac-switch" onclick="toggleDiacritics(this)" aria-pressed="false">
+          <span class="rt-knob"></span>
+        </button>
+        <span id="diac-switch-state">off</span>
+      </span>
     </div>
     <div id="msg"></div>
     <div id="deck-scroll"></div>
