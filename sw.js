@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kana-no-katas-v40';
+const CACHE_NAME = 'kana-no-katas-v41';
 const ASSETS = [
   '/',
   '/index.html',

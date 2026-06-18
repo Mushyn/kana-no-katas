@@ -344,7 +344,9 @@ function showBilan() {
   });
 
   const og = document.getElementById('b-ok-grid'); og.innerHTML = '';
-  successSet.forEach(r => {
+  const gojuonOrder = Object.keys(H); // ordre canonique a,i,u,e,o,ka,ki,ku... défini dans data.js
+  const sortedSuccess = [...successSet].sort((a, b) => gojuonOrder.indexOf(a) - gojuonOrder.indexOf(b));
+  sortedSuccess.forEach(r => {
     const c = document.createElement('div'); c.className = 'bilan-card bc-ok';
     c.innerHTML = ((H[r] || '') + (K[r] || '')) + '<span>' + r + '</span>';
     og.appendChild(c);
