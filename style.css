@@ -357,6 +357,15 @@ body {
 }
 .col-check .col-check-kana { font-size: 16px; }
 
+/* ── Mode d'emploi (lien vers guide/index.html) ── */
+.help-btn {
+  font-size: 13px; font-weight: 700; color: var(--text2);
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 50%; cursor: pointer; width: 26px; height: 26px;
+  flex-shrink: 0; padding: 0; text-decoration: none;
+  display: flex; align-items: center; justify-content: center;
+}
+
 /* ── Bannière de mise à jour PWA ── */
 #sw-update-banner {
   display: none; align-items: center; justify-content: center; gap: 12px;

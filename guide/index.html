@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>かな の 型 — Guide d'apprentissage</title>
+<meta name="theme-color" content="#A855F7">
+<link rel="stylesheet" href="../style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g-purple: #A855F7; --g-purple-light: #F3E8FF; --g-purple-dark: #7C3AED;
+    --g-green: #00C896; --g-green-light: #DCFCEE;
+    --g-bg: #ffffff; --g-bg2: #F7F6FB;
+    --g-text: #1A1A2E; --g-text2: #6B6B85;
+    --g-border: #E6E3F2;
+  }
+  * { box-sizing: border-box; }
+  html, body { overflow: visible; height: auto; }
+  body {
+    margin: 0; background: var(--g-bg2); color: var(--g-text);
+    font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7;
+  }
+  h1,h2,h3 { font-family: 'Outfit', sans-serif; }
+  .shell { max-width: 760px; margin: 0 auto; }
+
+  .appbar {
+    position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--g-border);
+  }
+  .appbar-inner { max-width: 760px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+  .back-link { color: var(--g-text2); text-decoration: none; font-size: 19px; flex-shrink: 0; }
+  .appbar-logo { font-weight: 800; font-size: 14px; color: var(--g-purple-dark); flex-shrink: 0; }
+  .nav-pills { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .nav-pills::-webkit-scrollbar { display: none; }
+  .nav-pill {
+    font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 20px;
+    background: var(--g-bg2); color: var(--g-text2); text-decoration: none; white-space: nowrap;
+    transition: all .15s;
+  }
+  .nav-pill.active { background: var(--g-purple); color: white; }
+
+  .hero { padding: 56px 24px 40px; text-align: center; }
+  .hero-badge {
+    display: inline-block; background: var(--g-purple-light); color: var(--g-purple-dark);
+    font-weight: 700; font-size: 13px; padding: 6px 16px; border-radius: 20px; margin-bottom: 22px;
+  }
+  .hero h1 { font-size: 38px; font-weight: 800; margin: 0 0 16px;
+    background: linear-gradient(120deg, var(--g-purple-dark), var(--g-purple));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-lead { font-size: 16.5px; color: var(--g-text2); max-width: 480px; margin: 0 auto; }
+
+  .chapter { background: var(--g-bg); margin: 0 16px 24px; border-radius: 24px; padding: 36px 28px; border: 1px solid var(--g-border); scroll-margin-top: 70px; }
+  @media (min-width: 600px) { .chapter { margin: 0 24px 28px; padding: 40px 36px; } }
+  .chapter-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--g-purple-dark); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .chapter-tag::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--g-purple); }
+  .chapter h2 { font-size: 25px; font-weight: 700; margin: 0 0 18px; }
+  .chapter p { color: var(--g-text2); margin: 0 0 18px; }
+  .chapter p.intro { font-size: 16.5px; color: var(--g-text); }
+
+  .lever-card { background: var(--g-bg2); border-radius: 16px; padding: 20px 22px; margin: 16px 0; }
+  .lever-title { font-weight: 700; font-size: 16px; color: var(--g-text); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .lever-num { flex-shrink: 0; width: 25px; height: 25px; border-radius: 50%; background: var(--g-purple); color: white; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .lever-card p { margin: 0; font-size: 15px; }
+
+  .tip-card { margin: 18px 0; padding: 15px 17px; background: var(--g-green-light); border-radius: 14px; display: flex; gap: 11px; align-items: flex-start; font-size: 14px; color: #0a5c46; }
+  .tip-card .tip-icon { font-size: 17px; flex-shrink: 0; }
+
+  .quote-card { margin: 24px 0 4px; padding: 20px 22px; border-radius: 16px;
+    background: linear-gradient(135deg, var(--g-purple), var(--g-purple-dark)); color: white;
+    font-weight: 600; font-size: 15.5px; line-height: 1.6; }
+
+  .phone { width: 200px; margin: 22px auto; border-radius: 26px; background: #111; padding: 7px;
+    box-shadow: 0 16px 36px rgba(124,58,237,0.18), 0 2px 8px rgba(0,0,0,0.08); }
+  .phone img { width: 100%; display: block; border-radius: 19px; }
+  .crop-card { margin: 14px 0 4px; border-radius: 14px; overflow: hidden; border: 1px solid var(--g-border); }
+  .crop-card img { width: 100%; display: block; }
+  .crop-label { font-size: 12.5px; color: var(--g-text2); text-align: center; margin: 6px 0 14px; }
+
+  .rhythm-card { background: var(--g-bg2); border-radius: 16px; padding: 20px; margin: 20px 0; }
+  .rhythm-row { display: flex; justify-content: space-between; gap: 4px; }
+  .rh-day { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+  .rh-label { font-size: 11.5px; color: var(--g-text2); font-weight: 600; }
+  .rh-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .rh-dot.grid { background: var(--g-purple); }
+  .rh-dot.trace { background: var(--g-green); }
+  .rhythm-legend { margin-top: 14px; font-size: 12.5px; color: var(--g-text2); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .rhythm-legend .rh-dot { display: inline-block; margin-left: 10px; }
+  .rhythm-legend .rh-dot:first-child { margin-left: 0; }
+
+  .footer { padding: 32px 24px 64px; text-align: center; font-size: 13px; color: var(--g-text2); }
+</style>
+</head>
+<body>
+
+  <div class="appbar">
+    <div class="appbar-inner">
+      <a class="back-link" href="../index.html" aria-label="Retour à l'application" title="Retour à l'application">←</a>
+      <div class="appbar-logo">かな の 型</div>
+      <div class="nav-pills" id="nav-pills"><a class="nav-pill active" href="#ch01">Mémoriser</a>
+<a class="nav-pill" href="#ch02">Le tableau</a>
+<a class="nav-pill" href="#ch03">Le tracé</a>
+<a class="nav-pill" href="#ch04">Routine</a></div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="hero">
+      <div class="hero-badge">Guide d'apprentissage</div>
+      <h1>Apprendre les kanas</h1>
+      <p class="hero-lead">Le guide du tableau et du tracé — comment l'application aide à mémoriser durablement l'hiragana et le katakana, et comment en tirer le meilleur parti.</p>
+    </div>
+
+    <div class="chapter" id="ch01">
+      <div class="chapter-tag">Chapitre 01</div>
+      <h2>Pourquoi les kanas résistent à la mémoire — et comment l'éviter</h2>
+      <p class="intro">92 symboles, 46 hiragana et 46 katakana, sans logique phonétique visible pour un œil habitué à l'alphabet latin : c'est ce qui rend le départ difficile. Le réflexe naturel — relire le tableau en boucle dans l'ordre — fonctionne rarement bien chez l'adulte. Trois leviers changent vraiment la donne.</p>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">1</span>La structure avant le volume</div>
+        <p>Le tableau n'est pas 92 symboles isolés : c'est 10 familles de consonnes croisées avec 5 voyelles. Apprendre « a·i·u·e·o » comme un seul bloc, puis « ka·ki·ku·ke·ko » comme un autre, donne au cerveau une structure à laquelle accrocher chaque nouveau caractère — au lieu de 92 formes à retenir une par une.</p>
+      </div>
+      <div class="tip-card"><span class="tip-icon">💡</span><div>Dans l'application, le bouton « Colonnes ▾ » permet de rester sur une seule famille jusqu'à ce qu'elle soit solide, plutôt que de diluer l'attention sur tout le tableau d'un coup.</div></div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">2</span>La répétition espacée plutôt que martelée</div>
+        <p>Revoir un kana juste avant de l'oublier consolide bien mieux la mémoire que de le revoir dix fois d'affilée le même jour. C'est le principe derrière le système de relance de l'application : une carte ratée n'est pas réessayée immédiatement, elle revient environ 15 cartes plus tard — assez pour que le rappel demande un petit effort, ce qui est justement ce qui renforce la trace mémorielle.</p>
+      </div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">3</span>Le geste, en plus de l'œil</div>
+        <p>Reconnaître un kana à la lecture et savoir le tracer de la main sollicitent deux mémoires différentes : la reconnaissance visuelle, et la mémoire procédurale, motrice. Travailler les deux ancre bien mieux qu'une seule. C'est tout l'intérêt de faire alterner le tableau et le tracé plutôt que de se limiter à l'un des deux.</p>
+      </div>
+
+      <div class="quote-card">Conseil concret pour démarrer : choisis une seule colonne du tableau (5 kanas) en mode hiragana, et reste dessus jusqu'à un bilan de session à 90% de réussite sans aide, avant d'en ajouter une seconde. Mieux vaut 5 kanas vraiment sus que 20 vaguement reconnus.</div>
+    </div>
+
+    <div class="chapter" id="ch02">
+      <div class="chapter-tag">Chapitre 02</div>
+      <h2>L'écran principal — le tableau</h2>
+      <p class="intro">Cet écran te présente une carte kana à la fois (ou plusieurs, selon le réglage) que tu dois associer à sa case dans le tableau de lecture japonaise — colonnes de droite à gauche, comme un vrai tableau gojūon.</p>
+
+      <div class="phone"><img src="img/index_home.png" alt="Écran principal"></div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">1</span>Choisir ce que tu révises</div>
+        <p>Les boutons ひ+カ / ひ / カ activent l'hiragana, le katakana, ou les deux à la fois. Le bouton « Colonnes ▾ » limite le tirage à une ou plusieurs colonnes précises du tableau — c'est le réglage le plus utile en phase d'apprentissage, pour répéter une famille de sons jusqu'à ce qu'elle soit acquise.</p>
+      </div>
+      <div class="crop-card"><img src="img/index_header.png" alt="Mode"></div>
+      <div class="crop-label">ひ+カ / ひ / カ — en haut de l'écran</div>
+      <div class="crop-card"><img src="img/index_scorebar.png" alt="Score"></div>
+      <div class="crop-label">Badges de score + sélecteur de colonnes</div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">2</span>Répondre à une carte</div>
+        <p>Deux façons de répondre : glisser-déposer la carte vers la bonne case du tableau, ou la sélectionner d'un tap puis taper la case cible. Un double-tap sur la carte la retourne pour révéler son romaji sans valider de réponse — utile pour vérifier une intuition sans casser le score.</p>
+      </div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">3</span>Ajuster le rythme</div>
+        <p>« 1/1 » ou « 5/5 » règle le nombre de cartes proposées simultanément — commence par 1/1 tant que la reconnaissance n'est pas immédiate. « Romaji » affiche la translitération en continu sous chaque carte : un filet de sécurité à retirer dès que possible, pour forcer la vraie lecture du kana.</p>
+      </div>
+      <div class="crop-card"><img src="img/index_deckcontrols.png" alt="Réglages"></div>
+      <div class="crop-label">Taille du tirage, romaji, diacritiques</div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">4</span>Le bilan de session</div>
+        <p>À la fin du tirage (ou à tout moment via l'icône graphique), le bilan distingue les kanas « à retravailler », triés par nombre d'erreurs, et les kanas « maîtrisés », dans l'ordre du tableau. C'est la photographie la plus utile pour décider ce qu'il faut revoir la prochaine fois.</p>
+      </div>
+      <div class="phone"><img src="img/index_bilan.png" alt="Bilan"></div>
+    </div>
+
+    <div class="chapter" id="ch03">
+      <div class="chapter-tag">Chapitre 03</div>
+      <h2>L'écran de tracé — ancrer le geste</h2>
+      <p class="intro">Une fois qu'un kana se reconnaît du premier coup d'œil sur le tableau, l'étape suivante consiste à savoir le tracer de mémoire, dans le bon ordre de traits. C'est tout l'objet de cet écran, accessible depuis le bilan de session ou via l'icône crayon.</p>
+
+      <div class="phone"><img src="img/trace_home.png" alt="Écran de tracé"></div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">1</span>Choisir le mode d'entraînement</div>
+        <p>ひ / カ basculent entre hiragana et katakana. Si tu arrives ici depuis l'écran principal (bouton crayon), le mode et les colonnes déjà choisis là-bas sont repris automatiquement — rien à reconfigurer. « Mode romaji » force l'affichage du romaji à la place du kana, pour t'entraîner à écrire un son sans aucun repère visuel : une difficulté à activer une fois la lecture acquise (sans cette option, environ 30% des cartes l'affichent déjà au hasard, pour t'y habituer progressivement). Les boutons 10 / 20 / 30 / Tout fixent la longueur de la session.</p>
+      </div>
+      <div class="crop-card"><img src="img/trace_romajibar.png" alt="Mode romaji et longueur"></div>
+      <div class="crop-label">Mode romaji, longueur de session</div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">2</span>Tracer dans la grille</div>
+        <p>Le kana de référence s'affiche en haut, dans une grille genkō yōshi — le même quadrillage que celui utilisé pour écrire le japonais à la main. Dessine-le dans la grille du bas, au doigt ou à la souris, trait par trait : chaque fois que tu lèves le doigt, ça compte comme un nouveau trait, affiché en haut à droite.</p>
+      </div>
+      <div class="phone"><img src="img/trace_drawing.png" alt="Tracé en cours"></div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">3</span>Lire le résultat</div>
+        <p>Après validation, ton tracé est comparé à la référence : un pourcentage de ressemblance (réussi à partir de 60%), et une alerte si l'ordre des traits ne correspond pas à la référence. L'ordre compte presque autant que la forme, parce que c'est lui qui rend l'écriture fluide à terme.</p>
+      </div>
+      <div class="phone"><img src="img/trace_result.png" alt="Résultat du tracé"></div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">4</span>Les autres contrôles</div>
+        <p>Corbeille pour effacer le tracé en cours sans changer de carte. Bouton « A » pour révéler ponctuellement le romaji ou le kana de la carte affichée, sans modifier le tirage des cartes suivantes. Flèche pour passer une carte sans la noter.</p>
+      </div>
+      <div class="crop-card"><img src="img/trace_controls.png" alt="Contrôles"></div>
+      <div class="crop-label">Effacer · indice · valider · passer</div>
+
+      <div class="quote-card">Un tracé hésitant au début est normal — la pénalité sur l'ordre des traits sert à corriger une habitude avant qu'elle se fige, pas à sanctionner une imperfection du geste.</div>
+    </div>
+
+    <div class="chapter" id="ch04">
+      <div class="chapter-tag">Chapitre 04</div>
+      <h2>Construire une routine qui tient dans la durée</h2>
+      <p class="intro">Le principe le plus efficace de ce guide — la répétition espacée — n'a de valeur que si la pratique revient régulièrement. Voici un rythme de croisière réaliste, plutôt qu'un objectif ambitieux abandonné en une semaine.</p>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">1</span>Court et quotidien plutôt que long et rare</div>
+        <p>10 à 15 minutes par jour sur le tableau ancrent mieux qu'une heure le dimanche. Le système de relance de l'application (une carte ratée revient environ 15 cartes plus tard) ne produit son effet que si les sessions se répètent à quelques jours d'intervalle — pas en une seule fois.</p>
+      </div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">2</span>Reconnaissance d'abord, geste ensuite</div>
+        <p>Travaille une famille de kanas sur le tableau jusqu'à un bilan proche de 90%, avant de l'ajouter au tracé. Tracer un kana qu'on ne reconnaît pas encore bien à la lecture revient à mémoriser un geste sans le sens qui va avec : ça marche moins bien, et c'est plus frustrant.</p>
+      </div>
+
+      <div class="lever-card">
+        <div class="lever-title"><span class="lever-num">3</span>Une progression simple</div>
+        <p>Semaine 1 : « a·i·u·e·o » et « ka·ki·ku·ke·ko » en hiragana, sur le tableau seul. Une fois ces deux colonnes solides, ajoute-les au tracé tout en introduisant « sa·shi·su·se·so » sur le tableau. Garde le katakana pour une fois que l'ensemble de l'hiragana est confortable : les deux systèmes se ressemblent assez pour se mélanger dans la tête si on les démarre de front trop tôt.</p>
+      </div>
+      <div class="rhythm-card">
+      <div class="rhythm-row"><div class="rh-day"><span class="rh-label">Lun</span><span class="rh-dot grid" title="Tableau"></span></div><div class="rh-day"><span class="rh-label">Mar</span><span class="rh-dot grid" title="Tableau"></span><span class="rh-dot trace" title="Tracé"></span></div><div class="rh-day"><span class="rh-label">Mer</span><span class="rh-dot grid" title="Tableau"></span></div><div class="rh-day"><span class="rh-label">Jeu</span><span class="rh-dot grid" title="Tableau"></span><span class="rh-dot trace" title="Tracé"></span></div><div class="rh-day"><span class="rh-label">Ven</span><span class="rh-dot grid" title="Tableau"></span></div><div class="rh-day"><span class="rh-label">Sam</span><span class="rh-dot grid" title="Tableau"></span><span class="rh-dot trace" title="Tracé"></span></div><div class="rh-day"><span class="rh-label">Dim</span><span class="rh-dot grid" title="Tableau"></span></div></div>
+      <div class="rhythm-legend"><span class="rh-dot grid"></span> Tableau (quotidien) <span class="rh-dot trace"></span> Tracé (1 jour sur 2)</div>
+    </div>
+
+      <div class="quote-card">L'objectif n'est pas de finir vite. C'est de ne pas avoir à tout réapprendre dans six mois.</div>
+    </div>
+
+    <div class="footer">かな の 型 — Documentation utilisateur</div>
+  </div>
+
+<script>
+  const pills = [...document.querySelectorAll('.nav-pill')];
+  const sections = pills.map(p => document.querySelector(p.getAttribute('href')));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = sections.indexOf(entry.target);
+        pills.forEach(p => p.classList.remove('active'));
+        if (idx > -1) pills[idx].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach(s => s && io.observe(s));
+</script>
+</body>
+</html>

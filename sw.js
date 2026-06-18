@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kana-no-katas-v41';
+const CACHE_NAME = 'kana-no-katas-v43';
 const ASSETS = [
   '/',
   '/index.html',
@@ -7,6 +7,17 @@ const ASSETS = [
   '/game.js',
   '/manifest.json',
   '/trace.html',
+  '/guide/index.html',
+  '/guide/img/index_home.png',
+  '/guide/img/index_header.png',
+  '/guide/img/index_scorebar.png',
+  '/guide/img/index_deckcontrols.png',
+  '/guide/img/index_bilan.png',
+  '/guide/img/trace_home.png',
+  '/guide/img/trace_drawing.png',
+  '/guide/img/trace_result.png',
+  '/guide/img/trace_controls.png',
+  '/guide/img/trace_romajibar.png',
   '/strokes/reference_strokes.json',
   '/strokes/h/a.svg',
   '/strokes/h/e.svg',
