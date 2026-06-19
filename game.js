@@ -8,7 +8,6 @@ let score = { ok: 0, err: 0 };
 let fullDeck = [], activeDeck = [];
 let selectedCard = null, cells = {};
 let errorMap = {}, successSet = new Set(), locked = false;
-let dragCard = null;
 
 // ── Utilitaires ──
 function shuffle(arr) {
@@ -118,13 +117,10 @@ function buildGrid() {
         cell.classList.remove('drag-over');
         if (!locked) handleDrop(cell, e.dataTransfer.getData('cid'));
       });
-      // Tap (sélection en 2 temps)
+      // Tap (sélection en 2 temps) — fonctionne aussi au tactile via le
+      // click synthétisé par le navigateur après un tap simple (aucun
+      // preventDefault ici qui pourrait l'empêcher).
       cell.addEventListener('click', () => { if (!locked) handleCellClick(cell); });
-      // Touch drop
-      cell.addEventListener('touchend', e => {
-        e.preventDefault();
-        if (!locked && dragCard) { handleDrop(cell, dragCard); dragCard = null; }
-      }, { passive: false });
 
       cells[romaji] = cell;
       colEl.appendChild(cell);
@@ -192,16 +188,67 @@ function renderDeck() {
     });
     el.addEventListener('dragend', () => el.classList.remove('dragging'));
 
-    // Touch drag
-    el.addEventListener('touchstart', () => {
+    // Touch drag (glisser au doigt) + tap (sélection en 2 temps)
+    // Les Touch Events gardent toujours leur cible d'origine (la carte),
+    // contrairement aux événements souris : il faut donc suivre le doigt
+    // soi-même et déterminer la case sous le doigt au lâcher avec
+    // document.elementFromPoint, plutôt que d'attendre un "drop" qui
+    // n'arrivera jamais sur la case.
+    let touchStart = null, touchMoved = false;
+
+    el.addEventListener('touchstart', e => {
       if (locked) return;
-      dragCard = card.id;
-      document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
+      const t = e.touches[0];
+      touchStart = { x: t.clientX, y: t.clientY };
+      touchMoved = false;
     }, { passive: true });
-    el.addEventListener('touchend', () => {
-      el.classList.remove('selected');
-    }, { passive: true });
+
+    el.addEventListener('touchmove', e => {
+      if (locked || !touchStart) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchStart.x, dy = t.clientY - touchStart.y;
+      if (!touchMoved && Math.hypot(dx, dy) > 8) {
+        touchMoved = true;
+        const r = el.getBoundingClientRect();
+        el.dataset.ox = r.left; el.dataset.oy = r.top;
+        el.style.width = r.width + 'px';
+        el.style.position = 'fixed';
+        el.style.zIndex = '1000';
+        el.style.pointerEvents = 'none';
+        el.classList.add('dragging');
+        document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+        selectedCard = null;
+      }
+      if (touchMoved) {
+        e.preventDefault(); // empêche le scroll de la page pendant le glisser
+        el.style.left = (parseFloat(el.dataset.ox) + dx) + 'px';
+        el.style.top = (parseFloat(el.dataset.oy) + dy) + 'px';
+        document.querySelectorAll('.cell.drag-over').forEach(c => c.classList.remove('drag-over'));
+        const under = document.elementFromPoint(t.clientX, t.clientY);
+        const cellUnder = under && under.closest('.cell');
+        if (cellUnder) cellUnder.classList.add('drag-over');
+      }
+    }, { passive: false });
+
+    el.addEventListener('touchend', e => {
+      document.querySelectorAll('.cell.drag-over').forEach(c => c.classList.remove('drag-over'));
+      if (touchMoved) {
+        e.preventDefault(); // un vrai glisser ne doit pas déclencher de tap derrière
+        el.style.position = ''; el.style.left = ''; el.style.top = '';
+        el.style.zIndex = ''; el.style.pointerEvents = ''; el.style.width = '';
+        el.classList.remove('dragging');
+        if (!locked) {
+          const t = e.changedTouches[0];
+          const under = document.elementFromPoint(t.clientX, t.clientY);
+          const cellUnder = under && under.closest('.cell');
+          if (cellUnder) handleDrop(cellUnder, card.id);
+        }
+      }
+      // Si ce n'était qu'un tap (touchMoved === false), on ne fait rien ici :
+      // le click synthétisé par le navigateur prendra le relais normalement
+      // pour la sélection en 2 temps gérée plus haut.
+      touchStart = null; touchMoved = false;
+    }, { passive: false });
 
     deckEl.appendChild(el);
   });
@@ -380,7 +427,7 @@ function toggleHints() {
 
 function resetGame() {
   score = { ok: 0, err: 0 }; errorMap = {}; successSet = new Set();
-  selectedCard = null; locked = false; dragCard = null;
+  selectedCard = null; locked = false;
   fullDeck = buildFullDeck(); activeDeck = [];
   buildGrid(); drawMore();
   document.getElementById('msg').textContent = '';
