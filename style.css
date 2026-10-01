@@ -132,7 +132,7 @@ body {
 }
 
 .cell {
-  width: var(--cell-size, 56px); height: var(--cell-size, 56px);
+  width: var(--cell-size, 56px); height: var(--cell-h, var(--cell-size, 56px));
   flex-shrink: 0; border-radius: 10px;
   border: 2px dashed var(--border);
   display: flex; align-items: center; justify-content: center; flex-direction: column;
@@ -141,7 +141,22 @@ body {
   transition: all 0.15s; position: relative; flex-shrink: 0;
 }
 .cell.empty-slot { background: transparent; border: none; }
-.cell.drag-over  { border-color: var(--purple); background: var(--purple-light); transform: scale(1.08); }
+.cell.drag-over  { border-color: var(--purple); background: var(--purple-light); z-index: 20; }
+
+/* Effet loupe : la case survolée (doigt qui glisse une carte, ou souris) s'agrandit en une bulle.
+   C'est un ::before sans pointer-events : la case garde sa vraie taille pour la détection du doigt. */
+.kana-col { overflow: visible; }
+.cell.drag-over::before {
+  content: attr(data-romaji); pointer-events: none;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: calc(var(--cell-size, 56px) * 2.3); height: calc(var(--cell-size, 56px) * 2.3); max-width: 84px; max-height: 84px; min-width: 40px; min-height: 40px;
+  display: flex; align-items: center; justify-content: center; border-radius: 16px;
+  background: var(--purple-light); border: 2px solid var(--purple); box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  font-size: 20px; font-weight: 700; color: var(--purple); z-index: 30;
+}
+#grid-zone.romaji-off .cell.drag-over::before { content: ''; }
+.cell.empty-slot::before { display: none !important; }
+@media (hover: hover) { .cell:hover { z-index: 20; } .cell:hover::before { content: attr(data-romaji); pointer-events: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: var(--purple-light); border: 2px solid var(--purple); box-shadow: 0 6px 18px rgba(0,0,0,.25); font-size: 18px; font-weight: 700; color: var(--purple); z-index: 30; } #grid-zone.romaji-off .cell:hover::before { content: ''; } }
 .cell.correct    { border: 2px solid var(--green); background: var(--green-light); cursor: default; }
 .cell.wrong      { border: 2px solid var(--red); background: var(--red-light); animation: shake 0.3s; }
 .cell.highlight  { border: 2px solid var(--amber-mid); background: var(--amber-light); animation: pulse 0.5s 4; }

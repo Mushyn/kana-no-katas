@@ -79,8 +79,33 @@ function calcCellSize() {
   const GAP = 4;        // gap entre cellules (ROWS-1 fois)
   const EXTRA = 8;      // marge de sécurité pour éviter tout débordement
   const available = zoneH - HDR - PADDING - (GAP * (ROWS - 1)) - EXTRA;
-  const size = Math.floor(available / ROWS);
-  return Math.max(44, size);
+  const hSize = Math.max(44, Math.floor(available / ROWS));
+
+  // Largeur : toute la grille doit tenir sur un écran (comme dans le puzzle), sans défilement horizontal.
+  const { cols, seps } = countVisibleColumns();
+  const SEP_W = 10;     // largeur d'un séparateur (.sep-col)
+  const SIDE = 20 + 4;  // padding gauche + droite de #grid-scroll + marge de sécurité
+  const zoneW = zone.getBoundingClientRect().width;
+  const gaps = GAP * Math.max(0, cols + seps - 1);
+  const wSize = Math.floor((zoneW - SIDE - gaps - SEP_W * seps) / Math.max(1, cols));
+
+  // Plancher de 14 px (comme le puzzle) : en dessous, la grille redevient défilable plutôt que illisible
+  const size = Math.max(14, Math.min(hSize, wSize));
+  // Case plus haute que large quand la largeur est le facteur limitant (comme le puzzle : --cw / --ch)
+  document.documentElement.style.setProperty('--cell-h', Math.max(size, Math.min(hSize, Math.round(size * 1.6))) + 'px');
+  return size;
+}
+
+// Nombre de colonnes de kanas et de séparateurs réellement affichés (mêmes règles que buildGrid)
+function countVisibleColumns() {
+  let cols = 0, seps = 0;
+  COLS.forEach(col => {
+    if (col.label === 'SEP' || col.label === 'SEP2') { if (showDiacritics) seps++; return; }
+    if (!showDiacritics && col.diacritic) return;
+    if (selectedCols && !selectedCols.includes(col.label + (col.diacritic ? col.s[0] : ''))) return;
+    cols++;
+  });
+  return { cols, seps };
 }
 
 // ── Grille ──
