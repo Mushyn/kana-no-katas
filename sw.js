@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kana-no-katas-v54';
+const CACHE_NAME = 'kana-no-katas-v55';
 const ASSETS = [
   './',
   'index.html',
@@ -23,6 +23,11 @@ const ASSETS = [
   'guide/img/trace_result.png',
   'guide/img/trace_controls.png',
   'guide/img/trace_romajibar.png',
+  'guide/img/puzzle_select.png',
+  'guide/img/puzzle_placing.png',
+  'guide/img/puzzle_colors.png',
+  'guide/img/puzzle_win.png',
+  'guide/img/puzzle_header.png',
   'strokes/reference_strokes.json',
   'strokes/h/a.svg',
   'strokes/h/e.svg',
