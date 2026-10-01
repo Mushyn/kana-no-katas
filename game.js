@@ -8,6 +8,22 @@ let score = { ok: 0, err: 0 };
 let fullDeck = [], activeDeck = [];
 let selectedCard = null, cells = {};
 let errorMap = {}, successSet = new Set(), locked = false;
+let pendingTimers = []; // minuteries liées à la partie en cours (annulées au reset)
+
+// setTimeout "rattaché à la partie" : si on recommence, tout ce qui était
+// programmé pour l'ancienne partie est annulé et ne peut plus la polluer.
+function later(fn, ms) {
+  const id = setTimeout(() => {
+    pendingTimers = pendingTimers.filter(t => t !== id);
+    fn();
+  }, ms);
+  pendingTimers.push(id);
+  return id;
+}
+function clearPendingTimers() {
+  pendingTimers.forEach(clearTimeout);
+  pendingTimers = [];
+}
 
 // ── Utilitaires ──
 function shuffle(arr) {
@@ -301,8 +317,8 @@ function handleDrop(cell, cardId) {
       cell.style.borderColor = 'var(--green)'; cell.style.background = 'var(--green-light)';
     }
     showMsg('✓ ' + card.char + ' → ' + romaji, 'ok');
-    if (activeDeck.length === 0 && fullDeck.length > 0) drawMore();
-    if (fullDeck.length === 0) setTimeout(() => showBilan(), 600);
+    if (activeDeck.length === 0 && fullDeck.length > 0) fillDeck();
+    if (fullDeck.length === 0) later(() => showBilan(), 600);
 
   } else {
     score.err++;
@@ -324,13 +340,13 @@ function handleDrop(cell, cardId) {
     if (cc) { cc.classList.add('highlight'); setTimeout(() => cc.classList.remove('highlight'), 3200); }
 
     // 3. Après 3.5s : réinsérer en fin de fullDeck, mélanger, piocher
-    setTimeout(() => {
+    later(() => {
       fullDeck.push(card);
       for (let i = fullDeck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [fullDeck[i], fullDeck[j]] = [fullDeck[j], fullDeck[i]];
       }
-      drawMore();
+      fillDeck(); // complète jusqu'à deckSize, sans dépasser
     }, 3500);
     return;
   }
@@ -344,7 +360,7 @@ function showFeedback(card) {
   document.getElementById('fb-romaji').textContent = card.romaji;
   document.getElementById('fb-col').textContent = 'colonne « ' + colLabelFor(card.romaji) + ' » — ' + card.romaji;
   document.getElementById('feedback').style.display = 'block';
-  setTimeout(() => { document.getElementById('feedback').style.display = 'none'; locked = false; }, 3500);
+  later(() => { document.getElementById('feedback').style.display = 'none'; locked = false; }, 3500);
 }
 
 function showMsg(text, type) {
@@ -364,14 +380,24 @@ function updateScores() {
   if (rc > 0) { re.style.display = ''; re.textContent = '↺ ' + rc; } else re.style.display = 'none';
 }
 
-function drawMore() {
-  if (!fullDeck.length) return;
-  const n = Math.min(deckSize, fullDeck.length);
+// Pioche n cartes de fullDeck qui ne sont pas déjà affichées
+function drawCards(n) {
   for (let i = 0; i < n; i++) {
     const c = fullDeck.find(c => !activeDeck.find(a => a.id === c.id));
-    if (c) activeDeck.push(c);
+    if (!c) break;
+    activeDeck.push(c);
   }
   renderDeck();
+}
+
+// Complète le paquet visible jusqu'à deckSize cartes (jamais au-delà)
+function fillDeck() {
+  drawCards(deckSize - activeDeck.length);
+}
+
+// Bouton « + » : ajoute volontairement deckSize cartes en plus
+function drawMore() {
+  drawCards(deckSize);
 }
 
 // ── Bilan ──
@@ -416,7 +442,7 @@ function setDeckSize(n, btn) {
   deckSize = n;
   document.querySelectorAll('.dc-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  activeDeck = []; drawMore();
+  activeDeck = []; fillDeck();
 }
 
 function toggleHints() {
@@ -426,10 +452,11 @@ function toggleHints() {
 }
 
 function resetGame() {
+  clearPendingTimers();
   score = { ok: 0, err: 0 }; errorMap = {}; successSet = new Set();
   selectedCard = null; locked = false;
   fullDeck = buildFullDeck(); activeDeck = [];
-  buildGrid(); drawMore();
+  buildGrid(); fillDeck();
   document.getElementById('msg').textContent = '';
   document.getElementById('bilan').style.display = 'none';
   document.getElementById('feedback').style.display = 'none';
