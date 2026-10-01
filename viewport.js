@@ -6,10 +6,14 @@
 // coupée. On remesure donc window.innerHeight (fiable) et on le pose nous-mêmes.
 (function () {
   const root = document.documentElement;
+  const KEY = 'kana-view-level';
+  const LEVELS = [0, 40, 80]; // réduction manuelle de la hauteur, en pixels (0 = plein écran)
   let last = null;
+  let level = 0;
+  try { level = Math.min(LEVELS.length - 1, Math.max(0, parseInt(localStorage.getItem(KEY), 10) || 0)); } catch (e) {}
 
   function sync() {
-    const h = Math.round(window.innerHeight);
+    const h = Math.round(window.innerHeight) - LEVELS[level];
     const changed = last !== null && h !== last;
     last = h;
     // On réécrit la valeur à chaque passage : si quelque chose l'a faussée, elle est corrigée.
@@ -18,6 +22,16 @@
     // « resize » : on le relance si la hauteur a changé sans que le navigateur l'ait fait.
     if (changed) window.dispatchEvent(new Event('resize'));
   }
+
+  // Bouton « taille de l'affichage » : passe au niveau de réduction suivant (plein -> 40 -> 80 -> plein).
+  // Filet de sécurité manuel si l'appareil se trompe sur la hauteur disponible.
+  window.getViewLevel = () => level;
+  window.cycleViewLevel = function () {
+    level = (level + 1) % LEVELS.length;
+    try { localStorage.setItem(KEY, String(level)); } catch (e) {}
+    sync();
+    return level;
+  };
 
   sync();
   window.addEventListener('resize', sync);

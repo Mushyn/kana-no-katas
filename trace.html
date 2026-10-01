@@ -260,6 +260,9 @@
       <button class="mode-btn active" onclick="setTraceMode('hiragana',this)">ひ</button>
       <button class="mode-btn" onclick="setTraceMode('katakana',this)">カ</button>
     </div>
+    <button class="view-btn" id="view-btn" onclick="onViewBtn(this)" aria-label="Ajuster la hauteur de l'affichage" title="Ajuster la hauteur de l'affichage">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+    </button>
     <a class="help-btn" href="guide/index.html#ch03" aria-label="Mode d'emploi" title="Mode d'emploi">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 5.5C3 4.67 3.67 4 4.5 4H10a2 2 0 0 1 2 2v14a1.5 1.5 0 0 0-1.5-1.5H4.5A1.5 1.5 0 0 1 3 17V5.5Z"/>
@@ -908,7 +911,15 @@ function loadConfigFromCardGame() {
   } catch (e) { return false; }
 }
 
+// Bouton « hauteur de l'affichage » : cycle plein -> réduit -> plus réduit (voir viewport.js)
+function onViewBtn(btn) {
+  const lvl = cycleViewLevel();
+  btn.classList.toggle('active', lvl > 0);
+  btn.title = lvl > 0 ? 'Affichage réduit (niveau ' + lvl + ')' : 'Ajuster la hauteur de l\'affichage';
+}
+
 function init() {
+  document.getElementById('view-btn').classList.toggle('active', getViewLevel() > 0);
   const cameFromGame = loadConfigFromCardGame();
   if (cameFromGame) {
     document.querySelectorAll('#trace-mode-toggle .mode-btn').forEach(b => {
