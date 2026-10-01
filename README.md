@@ -1,19 +1,41 @@
 # Kana no Katas — Hiragana & Katakana
 
-Jeu d'apprentissage des kanas japonais par glisser-déposer avec répétition espacée (SRS).  
+Application d'apprentissage des kanas japonais avec trois jeux : le tableau (glisser-déposer avec répétition espacée, SRS), le tracé (écriture à la main) et le puzzle (reconstituer le tableau).  
 Fonctionne hors-ligne une fois installé comme PWA.
 
 ## Fonctionnalités
+
+### Jeu 1 : le tableau
 
 - Grille complète en lecture japonaise (droite → gauche)
 - Hiragana, Katakana, ou les deux en alternance
 - Dakuten (が/ガ…) et handakuten (ぱ/パ…)
 - Cartes 1 par 1 ou 5 par 5
+- Bouton œil : affiche ou masque les sons (romaji) de la grille
 - Double clic sur une carte → révèle le romaji
 - Erreur → feedback 2s + réinjection dans ~15 cartes (SRS)
 - Bilan de session avec kanas à retravailler
+
+### Jeu 2 : le tracé (`trace.html`)
+
+- Tracé à la main dans une grille genkō yōshi, comparé à la référence (réussite à partir de 60 %)
+- Contrôle de l'ordre des traits
+- Mode romaji, longueur de session réglable
+
+### Jeu 3 : le puzzle (`puzzle.html`)
+
+- Une grille vide en haut, une pile de cartes mélangées et tournées en bas, à placer par glisser-déposer
+- Vérification quand la grille est pleine : vert (bien placée), jaune (bonne colonne), orange (bonne ligne), rouge (ni l'une ni l'autre)
+- Clignotement des cartes fausses pendant 10 s, puis retour dans la pile ; les cartes vertes restent verrouillées
+- Trois niveaux : Facile (5 colonnes au choix), Moyen (46 kanas), Difficile (71 kanas avec dakuten)
+- Score : 10 points par carte, moins 1 point par seconde ; meilleur score conservé par alphabet, niveau et colonnes
+- Bouton œil pour masquer les noms des colonnes et lignes
+
+### Commun
+
 - Dark mode automatique
 - Installable comme PWA (hors-ligne)
+- Bouton de hauteur d'affichage (`viewport.js`) pour les téléphones dont la barre du bas masque l'interface
 
 ---
 
@@ -57,7 +79,7 @@ L'URL sera : `https://TON_USERNAME.github.io/kana-no-katas/`
 ## Mise à jour
 
 Tout `git push` met à jour l'app automatiquement.  
-Le service worker vide son cache à chaque nouvelle version (incrémenter `CACHE_NAME` dans `sw.js` si besoin).
+Le service worker vide son cache à chaque nouvelle version : **incrémenter `CACHE_NAME` dans `sw.js` à chaque déploiement** (et ajouter tout nouveau fichier à la liste `ASSETS`). Les appareils déjà installés affichent alors un bandeau « Nouvelle version disponible ». GitHub Pages met environ 10 minutes à servir la nouvelle version.
 
 ---
 
@@ -65,19 +87,34 @@ Le service worker vide son cache à chaque nouvelle version (incrémenter `CACHE
 
 ```
 kana-no-katas/
-├── index.html      # Structure HTML
-├── style.css       # Styles + dark mode
-├── data.js         # Tables hiragana / katakana
-├── game.js         # Logique du jeu + SRS
-├── manifest.json   # Config PWA
-├── sw.js           # Service Worker (cache offline)
+├── index.html          # Jeu 1 : le tableau
+├── style.css           # Styles + dark mode
+├── data.js             # Tables hiragana / katakana
+├── game.js             # Logique du jeu 1 + SRS
+├── trace.html          # Jeu 2 : le tracé
+├── strokes/            # Données de tracé de référence
+├── puzzle.html         # Jeu 3 : le puzzle
+├── puzzle.css          # Styles du puzzle
+├── puzzle.js           # Interface du puzzle (classe PuzzleApp)
+├── puzzle-model.js     # Règles et score du puzzle (sans DOM, testable)
+├── viewport.js         # Hauteur d'affichage mesurée + réglage manuel
+├── guide/              # Guide d'apprentissage utilisateur
+├── tests/              # Tests du modèle du puzzle
+├── manifest.json       # Config PWA
+├── sw.js               # Service Worker (cache offline)
 └── icons/
     ├── icon-192.png
     └── icon-512.png
 ```
 
+## Tests
+
+```bash
+node --test tests/puzzle-model.test.js
+```
+
 ## Évolutions prévues
 
 - [ ] Combinaisons (kya/きゃ, sha/しゃ…)
-- [ ] Persistance du score entre sessions (localStorage)
+- [ ] Persistance de la progression SRS entre sessions (les meilleurs scores du puzzle sont déjà conservés)
 - [ ] Version React Native / Expo
