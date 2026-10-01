@@ -981,12 +981,20 @@ if ('serviceWorker' in navigator) {
     return h;
   };
   const r = id => { const e = document.getElementById(id); return e ? e.getBoundingClientRect() : null; };
+  // Version réellement installée (nom du cache du service worker) : lève le doute « a-t-il bien la dernière version ? »
+  let cacheNames = '(en cours)';
+  if (window.caches) caches.keys().then(k => { cacheNames = k.join(', ') || '(aucun)'; }).catch(() => { cacheNames = '(erreur)'; });
   function refresh() {
     if (panel.style.display === 'none') return;
     const vv = window.visualViewport;
     const app = r('trace-app'), ctl = r('trace-controls');
     const cs = getComputedStyle(probe);
     const lines = [
+      'version SW : ' + cacheNames,
+      'viewport.js: ' + (document.documentElement.style.getPropertyValue('--app-h') || 'ABSENT'),
+      'app height : ' + getComputedStyle(document.getElementById('trace-app')).height,
+      'html/body H: ' + Math.round(document.documentElement.getBoundingClientRect().height) + ' / ' + Math.round(document.body.getBoundingClientRect().height),
+      'outerH/Y   : ' + outerHeight + ' / ' + screenY,
       'standalone : ' + matchMedia('(display-mode: standalone)').matches,
       'innerH/W   : ' + innerHeight + ' / ' + innerWidth,
       'visualVP   : ' + (vv ? Math.round(vv.height) + ' / ' + Math.round(vv.width) : 'n/a'),
