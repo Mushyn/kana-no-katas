@@ -23,3 +23,6 @@ npm-debug.log*
 
 # Env
 .env
+
+# Fichiers livrés par Claude dans la conversation (maquettes, icônes) : pas du code du site
+Claude outputs/
