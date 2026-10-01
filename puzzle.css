@@ -1,0 +1,158 @@
+/* ───────── Jeu « Puzzle » : styles propres à puzzle.html ───────── */
+:root {
+  --c-green: #00B386; --c-red: #E5483A; --c-orange: #F27A1A; --c-yellow: #C9A400;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --c-green: #2DFFAA; --c-red: #FF8A77; --c-orange: #FF9F5A; --c-yellow: #FFD84D; }
+}
+
+/* --app-h est posé par viewport.js (hauteur réelle de l'écran) */
+#pz-app {
+  display: flex; flex-direction: column; position: relative;
+  height: var(--app-h, 100dvh); max-width: 560px; margin: 0 auto;
+  background: var(--bg2); overflow: hidden;
+}
+.pz-screen { position: absolute; inset: 0; display: none; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); }
+.pz-screen.active { display: flex; }
+
+.pz-top {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px 8px; min-height: 46px;
+  background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.pz-top h1 { font-size: 19px; font-weight: 600; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pz-top .grow { flex: 1; }
+.pz-back { font-size: 20px; color: var(--text2); background: none; border: none; cursor: pointer; padding: 0 4px; text-decoration: none; }
+.pz-pill {
+  font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+  background: var(--purple-light); color: var(--purple);
+}
+.pz-iconbtn {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2); border: 1px solid var(--border); background: var(--bg2);
+}
+.pz-iconbtn.active { color: var(--purple); border-color: var(--purple); background: var(--purple-light); }
+.pz-iconbtn .eye-off { display: none; }
+.pz-iconbtn.active .eye-on { display: none; }
+.pz-iconbtn.active .eye-off { display: block; }
+.pz-ghost {
+  font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 18px; white-space: nowrap;
+  border: 1px solid var(--purple); background: var(--purple-light); color: var(--purple); cursor: pointer;
+}
+
+/* ── Écran de sélection ── */
+#screen-select { overflow-y: auto; }
+.pz-sel { padding: 16px 16px 28px; display: flex; flex-direction: column; gap: 16px; }
+.pz-title { text-align: center; }
+.pz-title .big { font-size: 34px; font-weight: 700; color: var(--purple); }
+.pz-title p { color: var(--text2); margin-top: 4px; }
+.pz-seg { display: flex; justify-content: center; gap: 8px; }
+.pz-seg button {
+  font-size: 20px; padding: 6px 22px; border-radius: 24px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text2);
+}
+.pz-seg button.active { background: var(--purple); color: #fff; border-color: var(--purple); }
+.pz-levels { display: flex; flex-direction: column; gap: 8px; }
+.pz-level {
+  text-align: left; padding: 12px 14px; border-radius: 14px; cursor: pointer;
+  border: 2px solid var(--border); background: var(--bg); color: var(--text);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.pz-level.active { border-color: var(--purple); background: var(--purple-light); }
+.pz-level .name { font-weight: 700; font-size: 16px; display: flex; justify-content: space-between; align-items: baseline; }
+.pz-level .best { font-size: 12px; font-weight: 600; color: var(--purple); }
+.pz-level .desc { font-size: 12.5px; color: var(--text2); }
+
+.pz-picker { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; }
+.pz-picker-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+.pz-count { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 14px; background: var(--purple-light); color: var(--purple); white-space: nowrap; }
+.pz-count.full { background: color-mix(in srgb, var(--c-green) 25%, var(--bg)); color: var(--c-green); }
+.pz-count.warn { background: color-mix(in srgb, var(--c-orange) 25%, var(--bg)); color: var(--c-orange); }
+#pz-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pz-chip {
+  display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 20px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg2); color: var(--text2); font-size: 13px; user-select: none;
+}
+.pz-chip .k { font-size: 17px; }
+.pz-chip.on { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+.pz-chip-sep { flex-basis: 100%; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--text2); margin-top: 4px; }
+
+.pz-play {
+  padding: 14px; font-size: 17px; font-weight: 700; border-radius: 14px; border: none;
+  background: var(--purple); color: #fff; cursor: pointer;
+}
+.pz-play:disabled { opacity: .4; cursor: not-allowed; }
+
+.pz-legend {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; color: var(--text2);
+}
+.pz-legend h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
+.pz-legend .row { display: flex; align-items: center; gap: 8px; }
+.pz-sw {
+  width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0; border: 2px solid;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;
+}
+.pz-sw.green  { border-color: var(--c-green);  color: var(--c-green);  background: color-mix(in srgb, var(--c-green) 28%, var(--bg)); }
+.pz-sw.yellow { border-color: var(--c-yellow); color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 28%, var(--bg)); }
+.pz-sw.orange { border-color: var(--c-orange); color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 28%, var(--bg)); }
+.pz-sw.red    { border-color: var(--c-red);    color: var(--c-red);    background: color-mix(in srgb, var(--c-red) 28%, var(--bg)); }
+
+/* ── Écran de jeu ── */
+#pz-play { flex: 1 1 0; min-height: 0; position: relative; display: flex; flex-direction: column; }
+#pz-gridzone {
+  flex: 1 1 0; min-height: 0; background: var(--bg2); border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+#pz-pilezone { flex: 2 1 0; min-height: 0; position: relative; touch-action: none; background: color-mix(in srgb, var(--bg2) 70%, var(--bg)); }
+#pz-status { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text2); opacity: .75; pointer-events: none; }
+#pz-layer { position: absolute; inset: 0; pointer-events: none; }
+
+#pz-grid { display: flex; direction: rtl; gap: 2px; align-items: flex-start; }
+#pz-grid .col, #pz-grid .rowlab { display: flex; flex-direction: column; gap: 2px; align-items: center; direction: ltr; }
+#pz-grid .hdr { height: 14px; font-size: 10px; font-weight: 700; line-height: 14px; color: var(--text2); }
+#pz-grid .rowlab { width: 14px; }
+#pz-grid .rl { height: var(--ch); display: flex; align-items: center; font-size: 10px; font-weight: 700; color: var(--text2); }
+#pz-grid.nohints .hdr, #pz-grid.nohints .rl { visibility: hidden; }
+.pz-slot { width: var(--cw); height: var(--ch); border-radius: 5px; border: 1.5px dashed var(--border); background: var(--bg); }
+.pz-slot.empty { border: none; background: transparent; }
+.pz-slot.over { border: 1.5px solid var(--purple); background: var(--purple-light); }
+
+.pz-card {
+  position: absolute; display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; background: var(--bg); border: 1.5px solid var(--border);
+  box-shadow: 0 2px 6px rgba(0,0,0,.28); font-weight: 500; cursor: grab; pointer-events: auto;
+  touch-action: none; user-select: none; -webkit-user-select: none; transform-origin: 50% 50%;
+  transition: left .55s cubic-bezier(.2,.8,.2,1), top .55s cubic-bezier(.2,.8,.2,1), width .3s, height .3s, font-size .3s, transform .8s cubic-bezier(.2,.8,.2,1);
+}
+.pz-card.hira { color: var(--purple); }
+.pz-card.kata { color: var(--kata-accent); }
+.pz-card.in-slot { border-radius: 5px; box-shadow: none; }
+.pz-card.dragging { transition: none; box-shadow: 0 12px 26px rgba(0,0,0,.45); cursor: grabbing; }
+#pz-layer.shaking .pz-card { transition: none; }
+.pz-card.locked { cursor: default; }
+.pz-card .badge { position: absolute; right: 1px; bottom: 0; font-size: 9px; font-weight: 800; line-height: 1; }
+.pz-card.k-green  { border-color: var(--c-green);  background: color-mix(in srgb, var(--c-green) 28%, var(--bg)); }
+.pz-card.k-yellow { border-color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 28%, var(--bg)); }
+.pz-card.k-orange { border-color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 28%, var(--bg)); }
+.pz-card.k-red    { border-color: var(--c-red);    background: color-mix(in srgb, var(--c-red) 28%, var(--bg)); }
+.pz-card.k-green .badge  { color: var(--c-green); }
+.pz-card.k-yellow .badge { color: var(--c-yellow); }
+.pz-card.k-orange .badge { color: var(--c-orange); }
+.pz-card.k-red .badge    { color: var(--c-red); }
+.pz-card.off { border-color: var(--border) !important; background: var(--bg) !important; }
+.pz-card.off .badge { visibility: hidden; }
+
+#pz-skip { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); z-index: 1500; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+
+#pz-win {
+  display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2000;
+  width: min(86%, 340px); background: var(--bg); border: 3px solid var(--c-green); border-radius: 18px;
+  padding: 18px 20px; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.4);
+}
+#pz-win .t { font-size: 22px; font-weight: 700; color: var(--c-green); }
+#pz-win .score { font-size: 44px; font-weight: 800; color: var(--purple); line-height: 1.1; margin: 6px 0 2px; }
+#pz-win .score small { font-size: 16px; font-weight: 600; color: var(--text2); }
+#pz-win .rec { font-size: 13px; font-weight: 700; color: var(--c-orange); min-height: 18px; }
+#pz-win .det { font-size: 13px; color: var(--text2); margin: 4px 0 14px; }
+#pz-win .btns { display: flex; gap: 8px; justify-content: center; }

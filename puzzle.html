@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kana no Katas — Puzzle</title>
+  <meta name="theme-color" content="#A855F7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="puzzle.css" />
+  <script src="viewport.js"></script>
+</head>
+<body>
+<div id="pz-app">
+
+  <!-- ───── Écran 1 : sélection ───── -->
+  <section class="pz-screen active" id="screen-select">
+    <div class="pz-top">
+      <a class="pz-back" href="index.html" aria-label="Retour aux jeux">←</a>
+      <h1>かな の 型</h1>
+    </div>
+    <div class="pz-sel">
+      <div class="pz-title">
+        <div class="big">Puzzle</div>
+        <p>Reconstitue la grille des kanas</p>
+      </div>
+      <div class="pz-seg" id="pz-script">
+        <button data-s="h">ひ  Hiragana</button>
+        <button data-s="k">カ  Katakana</button>
+      </div>
+      <div class="pz-levels" id="pz-levels"></div>
+      <div class="pz-picker" id="pz-picker" style="display:none">
+        <div class="pz-picker-head"><span>Choisis 5 colonnes</span><span class="pz-count" id="pz-count"></span></div>
+        <div id="pz-chips"></div>
+      </div>
+      <button class="pz-play" id="pz-start">Jouer</button>
+      <div class="pz-legend">
+        <h3>Après chaque grille complète</h3>
+        <div class="row"><span class="pz-sw green">✓</span> Bien placée : elle reste en place</div>
+        <div class="row"><span class="pz-sw yellow">↕</span> Bonne colonne, mauvaise ligne : monte ou descends</div>
+        <div class="row"><span class="pz-sw orange">↔</span> Bonne ligne, mauvaise colonne : va à gauche ou à droite</div>
+        <div class="row"><span class="pz-sw red">✗</span> Ni la bonne colonne, ni la bonne ligne</div>
+        <div class="row" style="padding-top:4px">Les cartes mal placées clignotent 10 s puis retournent dans le tas. Plus tu vas vite, plus tu marques de points.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Écran 2 : jeu ───── -->
+  <section class="pz-screen" id="screen-game">
+    <div class="pz-top">
+      <button class="pz-back" id="pz-leave" aria-label="Retour à la sélection">←</button>
+      <h1 id="pz-gtitle">Puzzle</h1>
+      <span class="grow"></span>
+      <button class="pz-iconbtn" id="pz-eye" aria-pressed="false" aria-label="Masquer les noms de colonnes et de lignes" title="Afficher / masquer les noms de colonnes et de lignes">
+        <svg class="eye-on" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg class="eye-off" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      </button>
+      <button class="pz-iconbtn" id="pz-view" aria-label="Ajuster la hauteur de l'affichage" title="Ajuster la hauteur de l'affichage">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+      </button>
+      <span class="pz-pill" id="pz-score">0 pts</span>
+    </div>
+    <div id="pz-play">
+      <div id="pz-gridzone"><div id="pz-grid"></div></div>
+      <div id="pz-pilezone"><div id="pz-status"></div></div>
+      <div id="pz-layer"></div>
+      <button class="pz-ghost" id="pz-skip" style="display:none">Passer le clignotement ›</button>
+      <div id="pz-win">
+        <div class="t">Puzzle complet !</div>
+        <div class="score" id="pz-win-score"></div>
+        <div class="rec" id="pz-win-rec"></div>
+        <div class="det" id="pz-win-det"></div>
+        <div class="btns">
+          <button class="pz-ghost" id="pz-menu">Menu</button>
+          <button class="pz-play" id="pz-again" style="padding:8px 22px;font-size:15px">Rejouer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="data.js"></script>
+<script src="puzzle-model.js"></script>
+<script src="puzzle.js"></script>
+
+<div id="sw-update-banner" style="display:none;">
+  <span>✨ Nouvelle version disponible</span>
+  <button onclick="applySwUpdate()">Mettre à jour</button>
+</div>
+<script>
+  // Détection de mise à jour PWA (même mécanisme que index.html et trace.html)
+  let swRegistration = null;
+  function showUpdateBanner() { document.getElementById('sw-update-banner').style.display = 'flex'; }
+  function applySwUpdate() {
+    if (!swRegistration || !swRegistration.waiting) return;
+    swRegistration.waiting.postMessage('SKIP_WAITING');
+  }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {
+          swRegistration = reg;
+          if (reg.waiting) showUpdateBanner();
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing; if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
+            });
+          });
+        })
+        .catch(e => console.warn('SW KO', e));
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return; refreshing = true; window.location.reload();
+      });
+      setInterval(() => { if (swRegistration) swRegistration.update(); }, 60 * 60 * 1000);
+    });
+  }
+</script>
+</body>
+</html>
