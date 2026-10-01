@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kana no Katas — Lecture</title>
+  <meta name="theme-color" content="#A855F7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="puzzle.css" />
+  <link rel="stylesheet" href="lecture.css" />
+  <script src="viewport.js"></script>
+</head>
+<body>
+<div id="lc-app">
+
+  <!-- ───── Écran 1 : sélection (colonnes + taille de la séance) ───── -->
+  <section class="pz-screen active" id="lc-select">
+    <div class="pz-top">
+      <a class="pz-back" href="index.html" aria-label="Retour aux jeux">←</a>
+      <h1>かな の 型</h1>
+    </div>
+    <div class="pz-sel">
+      <div class="pz-title">
+        <div class="big">Lecture</div>
+        <p>Lis des mots avec leur photo</p>
+      </div>
+      <div class="pz-picker">
+        <div class="pz-picker-head"><span>Colonnes que je connais</span><span class="pz-count" id="lc-count"></span></div>
+        <div id="lc-chips"></div>
+        <p class="pz-picker-note">Un mot n'apparaît que si tous ses kanas sont dans les colonnes choisies.</p>
+      </div>
+      <div>
+        <div class="lc-label">Mots par séance</div>
+        <div class="lc-seg" id="lc-size"></div>
+      </div>
+      <button class="pz-play" id="lc-start">Commencer</button>
+      <div class="pz-legend">
+        <h3>Comment ça marche</h3>
+        <div class="row">1. Découvrir : une photo, le mot en kana, un bouton pour l'écouter</div>
+        <div class="row">2. Choisir : retrouve le bon mot parmi trois, sans chrono ni score</div>
+        <div class="row">3. Les mots ratés reviennent en premier à la séance suivante</div>
+        <div class="row" style="padding-top:4px">L'œil affiche le romaji et le sens, masqués par défaut pour s'entraîner à lire.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Écran 2 : découvrir un mot ───── -->
+  <section class="pz-screen" id="lc-learn">
+    <div class="pz-top">
+      <button class="pz-back" data-leave aria-label="Retour à la sélection">←</button>
+      <h1>Découvrir</h1>
+      <span class="grow"></span>
+      <button class="pz-iconbtn" data-eye aria-pressed="false" aria-label="Afficher ou masquer le romaji et le sens" title="Afficher / masquer le romaji et le sens">
+        <svg class="eye-on" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg class="eye-off" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      </button>
+      <span class="pz-pill" id="lc-learn-count"></span>
+    </div>
+    <div class="lc-body">
+      <div class="lc-photo" id="lc-learn-photo"></div>
+      <div class="lc-word" id="lc-word"></div>
+      <div class="lc-romaji" id="lc-romaji"></div>
+      <div class="lc-sens" id="lc-sens"></div>
+      <button class="lc-listen" id="lc-learn-listen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>Écouter
+      </button>
+      <div class="lc-hint">Touche un kana pour l'entendre seul.</div>
+      <div class="lc-nav">
+        <button class="lc-btn" id="lc-prev">Précédent</button>
+        <button class="lc-btn main" id="lc-next">Suivant</button>
+      </div>
+      <div id="lc-voice"></div>
+    </div>
+  </section>
+
+  <!-- ───── Écran 3 : choisir le bon mot ───── -->
+  <section class="pz-screen" id="lc-quiz">
+    <div class="pz-top">
+      <button class="pz-back" data-leave aria-label="Retour à la sélection">←</button>
+      <h1>Quel est ce mot ?</h1>
+      <span class="grow"></span>
+      <button class="pz-iconbtn" data-eye aria-pressed="false" aria-label="Afficher ou masquer le romaji et le sens" title="Afficher / masquer le romaji et le sens">
+        <svg class="eye-on" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg class="eye-off" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      </button>
+      <span class="pz-pill" id="lc-quiz-count"></span>
+    </div>
+    <div class="lc-body">
+      <div class="lc-photo" id="lc-quiz-photo"></div>
+      <button class="lc-listen" id="lc-quiz-listen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>Écouter
+      </button>
+      <div class="lc-choices" id="lc-choices"></div>
+      <div class="lc-feedback" id="lc-feedback"></div>
+      <div class="lc-nav"><button class="lc-btn main" id="lc-quiz-next" disabled>Suivant</button></div>
+    </div>
+  </section>
+
+  <!-- ───── Écran 4 : bilan ───── -->
+  <section class="pz-screen" id="lc-done">
+    <div class="pz-top">
+      <button class="pz-back" data-leave aria-label="Retour à la sélection">←</button>
+      <h1>Bilan</h1>
+    </div>
+    <div class="lc-body">
+      <div class="lc-big">Bien joué !</div>
+      <div class="lc-hint">Pas de score ni de chrono : on garde seulement les mots à revoir.</div>
+      <div class="lc-sum" id="lc-sum"></div>
+      <div class="lc-done-btns">
+        <div class="lc-nav">
+          <button class="lc-btn" id="lc-review">Revoir les mots</button>
+          <button class="lc-btn main" id="lc-again">Nouvelle séance</button>
+        </div>
+        <button class="pz-ghost" data-leave>Menu</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="data.js"></script>
+<script src="vocab-data.js"></script>
+<script src="lecture-model.js"></script>
+<script src="lecture.js"></script>
+
+<div id="sw-update-banner" style="display:none;">
+  <span>✨ Nouvelle version disponible</span>
+  <button onclick="applySwUpdate()">Mettre à jour</button>
+</div>
+<script>
+  // Détection de mise à jour PWA (même mécanisme que index.html, trace.html et puzzle.html)
+  let swRegistration = null;
+  function showUpdateBanner() { document.getElementById('sw-update-banner').style.display = 'flex'; }
+  function applySwUpdate() {
+    if (!swRegistration || !swRegistration.waiting) return;
+    swRegistration.waiting.postMessage('SKIP_WAITING');
+  }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {
+          swRegistration = reg;
+          if (reg.waiting) showUpdateBanner();
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing; if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
+            });
+          });
+        })
+        .catch(e => console.warn('SW KO', e));
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return; refreshing = true; window.location.reload();
+      });
+      setInterval(() => { if (swRegistration) swRegistration.update(); }, 60 * 60 * 1000);
+    });
+  }
+</script>
+</body>
+</html>

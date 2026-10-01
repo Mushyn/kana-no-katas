@@ -1,6 +1,6 @@
 # Kana no Katas — Hiragana & Katakana
 
-Application d'apprentissage des kanas japonais avec trois jeux : le tableau (glisser-déposer avec répétition espacée, SRS), le tracé (écriture à la main) et le puzzle (reconstituer le tableau).  
+Application d'apprentissage des kanas japonais avec quatre jeux : le tableau (glisser-déposer avec répétition espacée, SRS), le tracé (écriture à la main), le puzzle (reconstituer le tableau) et la lecture (lire des mots illustrés par une photo).  
 Fonctionne hors-ligne une fois installé comme PWA.
 
 ## Fonctionnalités
@@ -30,6 +30,15 @@ Fonctionne hors-ligne une fois installé comme PWA.
 - Trois niveaux : Facile (on choisit les colonnes de départ, une colonne s'ajoute à chaque grille sans faute), Moyen (46 kanas), Difficile (71 kanas avec dakuten)
 - Score : 10 points par carte, moins 1 point par seconde ; meilleur score conservé par alphabet, niveau et colonnes
 - Bouton œil pour masquer les noms des colonnes et lignes
+
+### Jeu 4 : la lecture (`lecture.html`)
+
+- Lire de vrais mots japonais (109, de 2 à 4 kanas) illustrés par une photo : on découvre le mot, puis on retrouve le bon parmi trois
+- Sélecteur de colonnes : un mot n'est proposé que si tous ses kanas sont dans les colonnes choisies (pas forcément voisines)
+- Séances de 5 ou 10 mots, ou tous ; les mots ratés reviennent en premier à la séance suivante
+- Sans chrono, sans score, sans punition : une erreur montre la bonne réponse et marque le mot « à revoir »
+- Romaji et sens masqués par défaut (bouton œil pour les afficher) ; un seul son, déclenché par le bouton « Écouter » (voix japonaise du navigateur), rien ne se lance tout seul
+- Les photos sont des liens vers Pexels (ou quelques sites externes), aucune image n'est stockée dans le projet : elles demandent une connexion, le reste du jeu fonctionne hors-ligne. Licence et crédits des photographes : à confirmer
 
 ### Commun
 
@@ -97,9 +106,14 @@ kana-no-katas/
 ├── puzzle.css          # Styles du puzzle
 ├── puzzle.js           # Interface du puzzle (classe PuzzleApp)
 ├── puzzle-model.js     # Règles et score du puzzle (sans DOM, testable)
+├── lecture.html        # Jeu 4 : la lecture
+├── lecture.css         # Styles de la lecture
+├── lecture.js          # Interface de la lecture (classe LectureApp)
+├── lecture-model.js    # Règles de la lecture (mots jouables, séance, réponses ; sans DOM, testable)
+├── vocab-data.js       # Liste des mots et liens des photos
 ├── viewport.js         # Hauteur d'affichage mesurée + réglage manuel
 ├── guide/              # Guide d'apprentissage utilisateur
-├── tests/              # Tests du modèle du puzzle
+├── tests/              # Tests des modèles (puzzle, lecture)
 ├── manifest.json       # Config PWA
 ├── sw.js               # Service Worker (cache offline)
 └── icons/
@@ -111,6 +125,7 @@ kana-no-katas/
 
 ```bash
 node --test tests/puzzle-model.test.js
+node --test tests/lecture-model.test.js
 ```
 
 ## Évolutions prévues
