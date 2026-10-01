@@ -10,7 +10,7 @@
 }
 .lc-body {
   flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center;
-  gap: 12px; padding: 14px 16px; overflow-y: auto;
+  gap: 12px; padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 32px); overflow-y: auto;
 }
 
 /* ── Écran de sélection ── */
@@ -26,7 +26,7 @@
 
 /* ── Photo ── */
 .lc-photo {
-  width: 100%; aspect-ratio: 4 / 3; max-height: 34vh; border-radius: 20px; overflow: hidden; position: relative; flex-shrink: 0;
+  width: 100%; aspect-ratio: 4 / 3; max-height: 34vh; min-height: 90px; border-radius: 20px; overflow: hidden; position: relative; flex-shrink: 1;
   display: flex; align-items: center; justify-content: center;
   border: 2px dashed color-mix(in srgb, var(--text2) 40%, transparent);
 }
@@ -56,9 +56,13 @@
 #lc-app:not(.show-romaji) .lc-romaji,
 #lc-app:not(.show-romaji) .lc-sens,
 #lc-app:not(.show-romaji) .lc-kana small,
-#lc-app:not(.show-romaji) .lc-choice .r,
 #lc-app:not(.show-romaji) .lc-row .sens { display: none; }
 #lc-app:not(.show-romaji) .lc-kana { padding-top: 2px; }
+
+/* Photo réduite (bouton de redimensionnement du haut) */
+#lc-app.photo-small .lc-photo { max-height: 18vh; }
+#lc-app.photo-small .sz-small, #lc-app:not(.photo-small) .sz-big { display: none; }
+#lc-quiz-sens { margin-top: 0; min-height: 20px; }
 
 /* ── Bouton d'écoute (le seul son du jeu : rien ne se lance tout seul) ── */
 .lc-listen {
@@ -70,7 +74,7 @@
 .lc-listen.playing { background: var(--purple); color: #fff; }
 .lc-listen:disabled { opacity: .45; cursor: not-allowed; }
 
-.lc-nav { display: flex; gap: 10px; width: 100%; margin-top: auto; padding-top: 6px; }
+.lc-nav { display: flex; gap: 10px; width: 100%; margin-top: auto; padding-top: 6px; flex-shrink: 0; }
 .lc-btn {
   flex: 1; padding: 14px; border-radius: 16px; border: 2px solid var(--border);
   background: var(--bg); color: var(--text); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
@@ -79,17 +83,17 @@
 .lc-btn:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── Quiz : trois réponses, aucune punition ── */
-.lc-choices { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.lc-choices { display: flex; flex-direction: column; gap: 8px; width: 100%; flex-shrink: 0; }
 .lc-choice {
-  padding: 12px 16px; border-radius: 16px; border: 2px solid var(--border); background: var(--bg); color: var(--text);
+  padding: 8px 16px; border-radius: 16px; border: 2px solid var(--border); background: var(--bg); color: var(--text);
   font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left;
 }
 .lc-choice .k { font-size: 34px; font-family: 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif; }
-.lc-choice .r { font-size: 14px; color: var(--text2); }
+.lc-choice .r { display: none; }   /* jamais de romaji sur les choix : on s'entraîne à lire */
 .lc-choice.good { border-color: var(--c-green); background: color-mix(in srgb, var(--c-green) 25%, var(--bg)); }
 .lc-choice.try { border-color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 25%, var(--bg)); animation: lc-nod .35s; }
 @keyframes lc-nod { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-.lc-feedback { min-height: 40px; font-size: 14.5px; font-weight: 600; text-align: center; }
+.lc-feedback { min-height: 22px; flex-shrink: 0; font-size: 14.5px; font-weight: 600; text-align: center; }
 .lc-feedback.good { color: var(--c-green); }
 .lc-feedback.try { color: var(--c-orange); }
 

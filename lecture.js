@@ -97,7 +97,7 @@
   class LectureApp {
     constructor() {
       // Préférences mémorisées : colonnes choisies, taille de séance, œil, mots à revoir
-      this.prefs = loadJSON(PREFS_KEY, { picked: [0, 1, 2], size: 5, romaji: false, review: [] });
+      this.prefs = loadJSON(PREFS_KEY, { picked: [0, 1, 2], size: 5, romaji: false, small: false, review: [] });
       this.pool = [];         // mots jouables avec les colonnes choisies
       this.session = [];      // mots de la séance en cours
       this.game = null;       // LectureGame (modèle)
@@ -108,7 +108,7 @@
       this.initLearn();
       this.initQuiz();
       this.initDone();
-      this.applyEye();
+      this.applyEye(); this.applySize();
       pickVoice();
       if (canSpeak) speechSynthesis.onvoiceschanged = pickVoice;
     }
@@ -183,6 +183,10 @@
       document.querySelectorAll('[data-eye]').forEach(b => b.onclick = () => {
         this.prefs.romaji = !this.prefs.romaji; this.save(); this.applyEye();
       });
+      // Bouton de redimensionnement : photo grande ou réduite
+      document.querySelectorAll('[data-size]').forEach(b => b.onclick = () => {
+        this.prefs.small = !this.prefs.small; this.save(); this.applySize();
+      });
     }
 
     leave() { if (canSpeak) speechSynthesis.cancel(); this.refreshSelect(); this.show('lc-select'); }
@@ -220,6 +224,11 @@
       });
     }
 
+    applySize() {
+      $('#lc-app').classList.toggle('photo-small', !!this.prefs.small);
+      document.querySelectorAll('[data-size]').forEach(b => b.setAttribute('aria-pressed', String(!!this.prefs.small)));
+    }
+
     // ═════════ Écran Choisir ═════════
     initQuiz() {
       $('#lc-quiz-next').onclick = () => {
@@ -240,6 +249,7 @@
       this.answered = false;
       $('#lc-quiz-count').textContent = (this.game.index + 1) + ' / ' + this.game.total;
       showPhoto($('#lc-quiz-photo'), w);
+      $('#lc-quiz-sens').textContent = w.fr;   // visible seulement si l'œil est ouvert (CSS)
       const fb = $('#lc-feedback'); fb.textContent = ''; fb.className = 'lc-feedback';
       $('#lc-quiz-next').disabled = true;
       const box = $('#lc-choices'); box.innerHTML = '';
