@@ -367,12 +367,23 @@ body {
 }
 
 /* Bouton « taille de l'affichage » (même famille que .help-btn, mais discret) */
-.view-btn {
+.view-btn, .eye-btn {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; padding: 0;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
   color: var(--text2); border: 1px solid var(--border); background: var(--bg2);
 }
-.view-btn.active { color: var(--purple); border-color: var(--purple); background: var(--purple-light); }
+.view-btn.active, .eye-btn.active { color: var(--purple); border-color: var(--purple); background: var(--purple-light); }
+
+/* Œil de la grille : œil ouvert = sons visibles, œil barré = sons masqués.
+   visibility (et non display) pour que les kanas ne bougent pas dans les cases. */
+.eye-btn .eye-off { display: none; }
+.eye-btn.active .eye-on { display: none; }
+.eye-btn.active .eye-off { display: block; }
+#grid-zone.romaji-off .cell .rhint { visibility: hidden; }
+/* Dans la barre des scores : l'œil se range à droite, collé au bouton « Colonnes » */
+#score-bar .eye-btn { width: 26px; height: 26px; margin-left: auto; }
+#score-bar .eye-btn svg { width: 15px; height: 15px; }
+#score-bar .eye-btn + #col-selector-btn { margin-left: 0; }
 
 /* ── Bannière de mise à jour PWA ── */
 #sw-update-banner {

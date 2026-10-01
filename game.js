@@ -520,6 +520,29 @@ function applyColSelection() {
   resetGame();
 }
 
+// ── Œil : afficher / masquer les sons (romaji) dans la grille ──
+const GRID_ROMAJI_KEY = 'kana-grid-romaji-hidden';
+
+function applyGridRomaji(hidden) {
+  document.getElementById('grid-zone').classList.toggle('romaji-off', hidden);
+  const btn = document.getElementById('eye-btn');
+  btn.classList.toggle('active', hidden);
+  btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+  btn.setAttribute('aria-label', hidden ? 'Afficher les sons dans la grille' : 'Masquer les sons dans la grille');
+}
+
+function toggleGridRomaji() {
+  const hidden = !document.getElementById('grid-zone').classList.contains('romaji-off');
+  applyGridRomaji(hidden);
+  try { localStorage.setItem(GRID_ROMAJI_KEY, hidden ? '1' : '0'); } catch (e) { /* ignoré */ }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  let hidden = false;
+  try { hidden = localStorage.getItem(GRID_ROMAJI_KEY) === '1'; } catch (e) {}
+  applyGridRomaji(hidden);
+});
+
 // ── Transmettre la config au jeu de tracé via localStorage ──
 function saveConfigForTrace() {
   try {
