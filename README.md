@@ -1,6 +1,7 @@
 # Kana no Katas — Hiragana & Katakana
 
 Application d'apprentissage des kanas japonais avec quatre jeux : le tableau (glisser-déposer avec répétition espacée, SRS), le tracé (écriture à la main), le puzzle (reconstituer le tableau) et la lecture (lire des mots illustrés par une photo).  
+L'application s'ouvre sur un menu (`menu.html`) qui propose les quatre jeux ; chaque jeu a une flèche ← pour y revenir.  
 Fonctionne hors-ligne une fois installé comme PWA.
 
 ## Fonctionnalités
@@ -97,6 +98,8 @@ Le service worker vide son cache à chaque nouvelle version : **incrémenter `CA
 ```
 kana-no-katas/
 ├── index.html          # Jeu 1 : le tableau
+├── menu.html           # Page d'accueil : choix du jeu (quatre cartes)
+├── menu.css            # Styles du menu
 ├── style.css           # Styles + dark mode
 ├── data.js             # Tables hiragana / katakana
 ├── game.js             # Logique du jeu 1 + SRS

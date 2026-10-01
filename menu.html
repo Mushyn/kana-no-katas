@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kana no Katas</title>
+  <meta name="theme-color" content="#A855F7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="menu.css" />
+  <script src="viewport.js"></script>
+</head>
+<body>
+<div id="menu-app">
+
+  <div class="menu-top">
+    <h1>かな の 型</h1>
+  </div>
+
+  <div class="menu-body">
+    <div class="menu-title">
+      <div class="big">Kana no Katas</div>
+      <p>Choisis un jeu</p>
+    </div>
+
+    <!-- Les icônes sont celles déjà utilisées dans la barre de boutons de l'écran du tableau -->
+    <a class="menu-card" href="index.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      </span>
+      <span class="txt"><span class="name">Le tableau</span><span class="desc">Place chaque kana dans la grille, avec répétition espacée</span></span>
+    </a>
+
+    <a class="menu-card" href="trace.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+      </span>
+      <span class="txt"><span class="name">Le tracé</span><span class="desc">Écris les kanas à la main, trait par trait</span></span>
+    </a>
+
+    <a class="menu-card" href="puzzle.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2" transform="rotate(12 17.5 17.5)"/></svg>
+      </span>
+      <span class="txt"><span class="name">Le puzzle</span><span class="desc">Reconstitue la grille des kanas, en choisissant tes colonnes</span></span>
+    </a>
+
+    <a class="menu-card" href="lecture.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      </span>
+      <span class="txt"><span class="name">La lecture</span><span class="desc">Lis des mots illustrés par une photo, sans chrono</span></span>
+    </a>
+
+    <div class="menu-guide"><a href="guide/index.html">Guide d'apprentissage</a></div>
+  </div>
+
+</div>
+
+<div id="sw-update-banner" style="display:none;">
+  <span>✨ Nouvelle version disponible</span>
+  <button onclick="applySwUpdate()">Mettre à jour</button>
+</div>
+<script>
+  // Détection de mise à jour PWA (même mécanisme que les autres pages)
+  let swRegistration = null;
+  function showUpdateBanner() { document.getElementById('sw-update-banner').style.display = 'flex'; }
+  function applySwUpdate() {
+    if (!swRegistration || !swRegistration.waiting) return;
+    swRegistration.waiting.postMessage('SKIP_WAITING');
+  }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {
+          swRegistration = reg;
+          if (reg.waiting) showUpdateBanner();
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing; if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
+            });
+          });
+        })
+        .catch(e => console.warn('SW KO', e));
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return; refreshing = true; window.location.reload();
+      });
+      setInterval(() => { if (swRegistration) swRegistration.update(); }, 60 * 60 * 1000);
+    });
+  }
+</script>
+</body>
+</html>

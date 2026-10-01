@@ -1,0 +1,41 @@
+/* ───────── Menu : choisir son jeu ─────────
+   Les couleurs (--purple, --bg...) et le mode sombre viennent de style.css. */
+
+#menu-app {
+  display: flex; flex-direction: column; position: relative;
+  height: var(--app-h, 100dvh); max-width: 560px; margin: 0 auto;
+  background: var(--bg2); overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.menu-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px 8px; min-height: 46px; background: var(--bg);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.menu-top h1 { font-size: 21px; font-weight: 600; }
+
+.menu-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 14px; }
+.menu-title { text-align: center; margin-bottom: 4px; }
+.menu-title .big { font-size: 34px; font-weight: 700; color: var(--purple); }
+.menu-title p { color: var(--text2); margin-top: 4px; }
+
+/* Une carte par jeu : icône, nom, une phrase */
+.menu-card {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px;
+  background: var(--bg); border: 2px solid var(--border); color: var(--text); text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.menu-card:hover, .menu-card:active { border-color: var(--purple); background: var(--purple-light); }
+.menu-card .ico {
+  width: 54px; height: 54px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--purple); border: 1px solid var(--purple);
+  background: linear-gradient(145deg, var(--bg), var(--purple-light));
+  box-shadow: 0 3px 10px rgba(168, 85, 247, 0.25);
+}
+.menu-card .txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.menu-card .name { font-size: 18px; font-weight: 700; }
+.menu-card .desc { font-size: 13px; color: var(--text2); line-height: 1.35; }
+
+.menu-guide { margin-top: auto; text-align: center; padding-top: 6px; }
+.menu-guide a { font-size: 13px; font-weight: 600; color: var(--purple); text-decoration: none; }

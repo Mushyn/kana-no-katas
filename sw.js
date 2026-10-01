@@ -1,7 +1,9 @@
-const CACHE_NAME = 'kana-no-katas-v58';
+const CACHE_NAME = 'kana-no-katas-v59';
 const ASSETS = [
   './',
   'index.html',
+  'menu.html',
+  'menu.css',
   'style.css',
   'data.js',
   'game.js',
@@ -140,7 +142,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME).then(cache =>
       Promise.allSettled(
         ASSETS.map(url =>
-          cache.add(url).catch(err => console.warn('[SW] Échec de mise en cache (ignoré) :', url, err))
+          cache.add(new Request(url, { cache: 'reload' })).catch(err => console.warn('[SW] Échec de mise en cache (ignoré) :', url, err))
         )
       )
     )

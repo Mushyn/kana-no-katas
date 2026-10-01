@@ -2,7 +2,7 @@
   "name": "Kana no Katas — Hiragana & Katakana",
   "short_name": "Kana no Katas",
   "description": "Apprendre les kanas japonais par glisser-déposer avec répétition espacée.",
-  "start_url": "/kana-no-katas/",
+  "start_url": "/kana-no-katas/menu.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#A855F7",

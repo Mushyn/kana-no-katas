@@ -69,7 +69,10 @@ body {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-#header h1 { font-size: 21px; font-weight: 600; }
+#header h1 { font-size: 21px; font-weight: 600; white-space: nowrap; }
+.hd-left { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+@media (max-width: 360px) { #header { padding-left: 8px; padding-right: 8px; } #header h1 { font-size: 18px; } }
+.hd-back { font-size: 20px; line-height: 1; color: var(--text2); text-decoration: none; padding: 0 2px; }
 
 #mode-toggle { display: flex; gap: 4px; }
 .mode-btn {
