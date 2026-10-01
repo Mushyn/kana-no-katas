@@ -97,7 +97,7 @@
   class LectureApp {
     constructor() {
       // Préférences mémorisées : colonnes choisies, taille de séance, œil, mots à revoir
-      this.prefs = loadJSON(PREFS_KEY, { picked: [0, 1, 2], size: 5, romaji: false, small: false, review: [] });
+      this.prefs = loadJSON(PREFS_KEY, { picked: [0, 1, 2], size: 5, romaji: false, review: [] });
       this.pool = [];         // mots jouables avec les colonnes choisies
       this.session = [];      // mots de la séance en cours
       this.game = null;       // LectureGame (modèle)
@@ -108,7 +108,7 @@
       this.initLearn();
       this.initQuiz();
       this.initDone();
-      this.applyEye(); this.applySize();
+      this.applyEye();
       pickVoice();
       if (canSpeak) speechSynthesis.onvoiceschanged = pickVoice;
     }
@@ -183,9 +183,13 @@
       document.querySelectorAll('[data-eye]').forEach(b => b.onclick = () => {
         this.prefs.romaji = !this.prefs.romaji; this.save(); this.applyEye();
       });
-      // Bouton de redimensionnement : photo grande ou réduite
-      document.querySelectorAll('[data-size]').forEach(b => b.onclick = () => {
-        this.prefs.small = !this.prefs.small; this.save(); this.applySize();
+      // Réglage manuel de la hauteur (viewport.js), comme dans le puzzle et le tracé
+      document.querySelectorAll('[data-view]').forEach(b => {
+        b.classList.toggle('active', getViewLevel() > 0);
+        b.onclick = () => {
+          const on = cycleViewLevel() > 0;
+          document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', on));
+        };
       });
     }
 
@@ -222,11 +226,6 @@
         b.classList.toggle('active', !this.prefs.romaji);
         b.setAttribute('aria-pressed', String(!this.prefs.romaji));
       });
-    }
-
-    applySize() {
-      $('#lc-app').classList.toggle('photo-small', !!this.prefs.small);
-      document.querySelectorAll('[data-size]').forEach(b => b.setAttribute('aria-pressed', String(!!this.prefs.small)));
     }
 
     // ═════════ Écran Choisir ═════════

@@ -59,10 +59,6 @@
 #lc-app:not(.show-romaji) .lc-row .sens { display: none; }
 #lc-app:not(.show-romaji) .lc-kana { padding-top: 2px; }
 
-/* Photo réduite (bouton de redimensionnement du haut) */
-#lc-app.photo-small .lc-photo { max-height: 18vh; }
-#lc-app.photo-small .sz-small, #lc-app:not(.photo-small) .sz-big { display: none; }
-#lc-quiz-sens { margin-top: 0; min-height: 20px; }
 
 /* ── Bouton d'écoute (le seul son du jeu : rien ne se lance tout seul) ── */
 .lc-listen {
