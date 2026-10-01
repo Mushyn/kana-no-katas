@@ -7,11 +7,12 @@
   <meta name="theme-color" content="#A855F7" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
+  <script src="viewport.js"></script>
   <style>
     html, body { height: 100%; overflow: hidden; }
     #trace-app {
       display: flex; flex-direction: column;
-      height: 100dvh; background: var(--bg2);
+      height: var(--app-h, 100dvh); background: var(--bg2); /* --app-h : voir viewport.js */
       max-width: 680px; margin: 0 auto;
       position: relative;
     }

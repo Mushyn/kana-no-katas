@@ -1,10 +1,11 @@
-const CACHE_NAME = 'kana-no-katas-v48';
+const CACHE_NAME = 'kana-no-katas-v49';
 const ASSETS = [
   './',
   'index.html',
   'style.css',
   'data.js',
   'game.js',
+  'viewport.js',
   'manifest.json',
   'trace.html',
   'guide/index.html',

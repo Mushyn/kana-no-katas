@@ -55,7 +55,7 @@ body {
 /* ── Layout principal ── */
 #app {
   display: flex; flex-direction: column;
-  height: 100dvh;
+  height: var(--app-h, 100dvh); /* --app-h : voir viewport.js */
   max-width: 680px; margin: 0 auto;
   padding-top: env(safe-area-inset-top, 0px);
   position: relative;
