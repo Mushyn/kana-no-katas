@@ -962,6 +962,63 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<!-- ── Diagnostic de mise en page (temporaire) : triple-tap sur le titre pour afficher/masquer ── -->
+<div id="dbg-panel" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(0,0,0,.88);color:#7CFFB2;font:11px/1.35 monospace;padding:8px 10px;white-space:pre-wrap;"></div>
+<script>
+(function () {
+  const panel = document.getElementById('dbg-panel');
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;top:0;width:0;visibility:hidden;pointer-events:none;' +
+    'padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);';
+  document.body.appendChild(probe);
+  const unit = u => {
+    const d = document.createElement('div');
+    d.style.cssText = 'position:fixed;left:0;top:0;width:0;visibility:hidden;height:100' + u;
+    document.body.appendChild(d);
+    const h = Math.round(d.getBoundingClientRect().height);
+    d.remove();
+    return h;
+  };
+  const r = id => { const e = document.getElementById(id); return e ? e.getBoundingClientRect() : null; };
+  function refresh() {
+    if (panel.style.display === 'none') return;
+    const vv = window.visualViewport;
+    const app = r('trace-app'), ctl = r('trace-controls');
+    const cs = getComputedStyle(probe);
+    const lines = [
+      'standalone : ' + matchMedia('(display-mode: standalone)').matches,
+      'innerH/W   : ' + innerHeight + ' / ' + innerWidth,
+      'visualVP   : ' + (vv ? Math.round(vv.height) + ' / ' + Math.round(vv.width) : 'n/a'),
+      'screen H/W : ' + screen.height + ' / ' + screen.width + ' (avail ' + screen.availHeight + ')',
+      'clientH    : ' + document.documentElement.clientHeight,
+      '100vh/dvh  : ' + unit('vh') + ' / ' + unit('dvh'),
+      '100svh/lvh : ' + unit('svh') + ' / ' + unit('lvh'),
+      'DPR        : ' + devicePixelRatio,
+      'safe top/bot: ' + cs.paddingTop + ' / ' + cs.paddingBottom,
+      '#trace-app : top ' + Math.round(app.top) + ' bottom ' + Math.round(app.bottom),
+      '#controls  : top ' + Math.round(ctl.top) + ' bottom ' + Math.round(ctl.bottom),
+      '=> bouton cache ? ' + (ctl.bottom > innerHeight + 1 ? 'OUI, deborde de ' + Math.round(ctl.bottom - innerHeight) + 'px' : 'non'),
+      navigator.userAgent
+    ];
+    panel.textContent = lines.join('\n');
+  }
+  // Triple-tap sur le titre
+  let taps = [];
+  document.querySelector('#trace-header h1').addEventListener('click', () => {
+    const now = Date.now();
+    taps = taps.filter(t => now - t < 700).concat(now);
+    if (taps.length >= 3) {
+      taps = [];
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      refresh();
+    }
+  });
+  panel.addEventListener('click', () => { panel.style.display = 'none'; });
+  addEventListener('resize', refresh);
+  if (window.visualViewport) visualViewport.addEventListener('resize', refresh);
+  setInterval(refresh, 1000);
+})();
+</script>
 <div id="sw-update-banner" style="display:none;">
   <span>✨ Nouvelle version disponible</span>
   <button onclick="applySwUpdate()">Mettre à jour</button>
