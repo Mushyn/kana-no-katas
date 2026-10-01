@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kana-no-katas-v56';
+const CACHE_NAME = 'kana-no-katas-v57';
 const ASSETS = [
   './',
   'index.html',
@@ -27,6 +27,7 @@ const ASSETS = [
   'guide/img/puzzle_placing.png',
   'guide/img/puzzle_colors.png',
   'guide/img/puzzle_win.png',
+  'guide/img/puzzle_win_choice.png',
   'guide/img/puzzle_header.png',
   'strokes/reference_strokes.json',
   'strokes/h/a.svg',

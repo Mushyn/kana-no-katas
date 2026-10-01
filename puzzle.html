@@ -32,8 +32,9 @@
       </div>
       <div class="pz-levels" id="pz-levels"></div>
       <div class="pz-picker" id="pz-picker" style="display:none">
-        <div class="pz-picker-head"><span>Choisis 5 colonnes</span><span class="pz-count" id="pz-count"></span></div>
+        <div class="pz-picker-head"><span>Colonnes de départ</span><span class="pz-count" id="pz-count"></span></div>
         <div id="pz-chips"></div>
+        <p class="pz-picker-note">Une colonne s'ajoute à chaque grille sans faute.</p>
       </div>
       <button class="pz-play" id="pz-start">Jouer</button>
       <div class="pz-legend">
@@ -72,6 +73,10 @@
         <div class="score" id="pz-win-score"></div>
         <div class="rec" id="pz-win-rec"></div>
         <div class="det" id="pz-win-det"></div>
+        <div class="next" id="pz-next" style="display:none">
+          <div class="nt">Sans faute ! Quelle colonne ajouter ?</div>
+          <div id="pz-next-chips"></div>
+        </div>
         <div class="btns">
           <button class="pz-ghost" id="pz-menu">Menu</button>
           <button class="pz-play" id="pz-again" style="padding:8px 22px;font-size:15px">Rejouer</button>

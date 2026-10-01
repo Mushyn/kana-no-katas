@@ -75,6 +75,7 @@
 }
 .pz-chip .k { font-size: 17px; }
 .pz-chip.on { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+.pz-picker-note { margin: 8px 0 0; font-size: 12px; color: var(--text2); }
 .pz-chip-sep { flex-basis: 100%; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--text2); margin-top: 4px; }
 
 .pz-play {
@@ -155,4 +156,7 @@
 #pz-win .score small { font-size: 16px; font-weight: 600; color: var(--text2); }
 #pz-win .rec { font-size: 13px; font-weight: 700; color: var(--c-orange); min-height: 18px; }
 #pz-win .det { font-size: 13px; color: var(--text2); margin: 4px 0 14px; }
+#pz-win .next { margin: 0 0 14px; }
+#pz-win .next .nt { font-size: 13px; font-weight: 700; color: var(--c-green); margin-bottom: 8px; }
+#pz-next-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 #pz-win .btns { display: flex; gap: 8px; justify-content: center; }

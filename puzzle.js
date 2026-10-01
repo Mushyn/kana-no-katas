@@ -17,7 +17,7 @@
   const BEST_KEY = 'kana-puzzle-best';
 
   const LEVELS = {
-    easy: { name: 'Facile',    desc: '5 colonnes de ton choix' },
+    easy: { name: 'Facile',    desc: 'Tu choisis les colonnes de départ ; une de plus à chaque grille sans faute' },
     mid:  { name: 'Moyen',     desc: 'Toutes les colonnes de base : 46 cartes' },
     hard: { name: 'Difficile', desc: 'Avec dakuten et handakuten : 71 cartes' }
   };
@@ -42,10 +42,12 @@
 
   class PuzzleApp {
     constructor() {
-      // Préférences mémorisées (alphabet, niveau, colonnes du niveau Facile, œil)
-      this.prefs = loadJSON(PREFS_KEY, { script: 'h', level: 'mid', picked: [0, 1, 2, 3, 4], hints: true });
+      // Préférences mémorisées (alphabet, niveau, colonnes de départ du niveau Facile, œil)
+      this.prefs = loadJSON(PREFS_KEY, { script: 'h', level: 'mid', picked: [0], hints: true });
       this.best = loadJSON(BEST_KEY, {});
 
+      this.curCols = [];         // Facile : colonnes jouées dans la partie en cours (elles s'allongent au fil des grilles sans faute)
+      this.nextAdd = null;       // Facile : colonne qui sera ajoutée d'office à la prochaine grille (null = pas d'ajout automatique)
       this.game = null;          // PuzzleGame (modèle)
       this.clock = null;         // ScoreClock
       this.phase = 'select';     // 'select' | 'play' | 'check' | 'done'
@@ -70,17 +72,47 @@
 
     get picked() { return new Set(this.prefs.picked); }
 
+    // Colonnes d'une liste d'indices (position dans ALL_COLS), dans l'ordre de la grille
+    colsFrom(indexes) {
+      const set = new Set(indexes);
+      return ALL_COLS.filter((c, i) => set.has(i));
+    }
+
+    // Colonnes affichées à l'écran de sélection (en Facile : celles de départ)
     columnsForPrefs() {
       const { level } = this.prefs;
-      if (level === 'easy') return ALL_COLS.filter((c, i) => this.picked.has(i));
+      if (level === 'easy') return this.colsFrom(this.prefs.picked);
       return level === 'mid' ? BASE_COLS : ALL_COLS;
+    }
+
+    // Colonnes de la partie en cours (en Facile : les colonnes de départ + celles gagnées)
+    columnsForGame() {
+      return this.prefs.level === 'easy' ? this.colsFrom(this.curCols) : this.columnsForPrefs();
+    }
+
+    // Facile : quelles colonnes peut-on ajouter après une grille sans faute ?
+    //  - une seule colonne jouée : on ajoute d'office la suivante dans l'ordre (a → k → s…),
+    //    ou la précédente si on est déjà à la toute dernière ;
+    //  - plusieurs colonnes : le joueur choisit parmi les colonnes voisines (juste avant ou juste
+    //    après une colonne déjà jouée). S'il n'y en a qu'une, elle est ajoutée d'office.
+    nextChoices() {
+      const cur = new Set(this.curCols), last = ALL_COLS.length - 1;
+      if (cur.size === 1) {
+        const i = this.curCols[0];
+        return [i < last ? i + 1 : i - 1];
+      }
+      const out = [];
+      for (let i = 0; i <= last; i++) {
+        if (!cur.has(i) && (cur.has(i - 1) || cur.has(i + 1))) out.push(i);
+      }
+      return out;
     }
 
     cardCount(columns) { return columns.reduce((n, c) => n + c.s.filter(Boolean).length, 0); }
 
-    // Clé du meilleur score : alphabet + niveau (+ colonnes choisies en Facile)
-    bestKey(level = this.prefs.level) {
-      const cols = level === 'easy' ? [...this.picked].sort((a, b) => a - b).join(',') : '';
+    // Clé du meilleur score : alphabet + niveau (+ colonnes jouées en Facile)
+    bestKey(level = this.prefs.level, indexes = this.prefs.picked) {
+      const cols = level === 'easy' ? [...indexes].sort((a, b) => a - b).join(',') : '';
       return this.prefs.script + '|' + level + '|' + cols;
     }
 
@@ -90,7 +122,7 @@
       document.querySelectorAll('#pz-script button').forEach(b => {
         b.onclick = () => { this.prefs.script = b.dataset.s; this.save(); this.refreshSelect(); };
       });
-      $('#pz-start').onclick = () => this.startGame();
+      $('#pz-start').onclick = () => { this.curCols = [...this.prefs.picked]; this.startGame(); };
       this.refreshSelect();
     }
 
@@ -114,7 +146,7 @@
       });
     }
 
-    // Niveau Facile : on choisit exactement 5 colonnes parmi les 16
+    // Niveau Facile : on choisit les colonnes de départ (au moins une, pas forcément voisines)
     buildPicker() {
       const easy = this.prefs.level === 'easy';
       $('#pz-picker').style.display = easy ? '' : 'none';
@@ -131,20 +163,16 @@
         wrap.appendChild(chip);
       });
       const n = this.picked.size, cn = $('#pz-count');
-      cn.className = 'pz-count' + (n === 5 ? ' full' : '');
-      cn.textContent = n + '/5 colonnes · ' + this.cardCount(this.columnsForPrefs()) + ' cartes';
-      $('#pz-start').disabled = n !== 5;
+      cn.className = 'pz-count' + (n >= 1 ? ' full' : '');
+      cn.textContent = n === 0
+        ? 'Choisis au moins 1 colonne'
+        : n + (n > 1 ? ' colonnes' : ' colonne') + ' · ' + this.cardCount(this.columnsForPrefs()) + ' cartes';
+      $('#pz-start').disabled = n < 1;
     }
 
     togglePicked(i) {
       const set = this.picked;
-      if (set.has(i)) set.delete(i);
-      else if (set.size < 5) set.add(i);
-      else {
-        const cn = $('#pz-count'); cn.classList.add('warn'); cn.textContent = '5 maximum : retires-en une';
-        setTimeout(() => this.buildPicker(), 1400);
-        return;
-      }
+      if (set.has(i)) set.delete(i); else set.add(i);
       this.prefs.picked = [...set].sort((a, b) => a - b);
       this.save();
       this.buildLevels();     // le meilleur score dépend des colonnes choisies
@@ -158,7 +186,11 @@
     initGame() {
       $('#pz-leave').onclick = () => this.leaveGame();
       $('#pz-menu').onclick = () => this.leaveGame();
-      $('#pz-again').onclick = () => this.startGame();
+      $('#pz-again').onclick = () => {
+        if (this.nextAdd != null) this.curCols.push(this.nextAdd);   // Facile, grille sans faute : la colonne s'ajoute d'office
+        this.nextAdd = null;
+        this.startGame();
+      };
       $('#pz-skip').onclick = () => { if (this.skipBlink) this.skipBlink(); };
 
       // Œil : afficher / masquer les noms de colonnes et de lignes
@@ -200,13 +232,14 @@
 
     startGame() {
       this.stopTimers();
-      this.columns = this.columnsForPrefs();
+      this.columns = this.columnsForGame();
       this.game = new PuzzleGame(this.columns);
       this.clock = new ScoreClock(this.game.total);
       this.phase = 'idle';
       $('#pz-win').style.display = 'none';
       $('#pz-skip').style.display = 'none';
-      $('#pz-gtitle').textContent = (this.prefs.script === 'h' ? 'ひ' : 'カ') + ' ' + LEVELS[this.prefs.level].name;
+      const nbCols = this.prefs.level === 'easy' ? ' · ' + this.columns.length + ' col.' : '';
+      $('#pz-gtitle').textContent = (this.prefs.script === 'h' ? 'ひ' : 'カ') + ' ' + LEVELS[this.prefs.level].name + nbCols;
       this.show('screen-game');
       // On attend que l'écran soit affiché pour mesurer les zones
       requestAnimationFrame(() => {
@@ -485,7 +518,7 @@
       const score = this.clock.score;
       $('#pz-score').textContent = score + ' pts';
 
-      const key = this.bestKey();
+      const key = this.bestKey(this.prefs.level, this.curCols);
       const previous = this.best[key];
       const record = previous == null || score > previous;
       if (record) { this.best[key] = score; saveJSON(BEST_KEY, this.best); }
@@ -495,7 +528,39 @@
       $('#pz-win-score').innerHTML = score + ' <small>/ ' + this.clock.capital + ' pts</small>';
       $('#pz-win-rec').textContent = record ? (previous == null ? 'Premier score enregistré !' : 'Nouveau record !') : 'Record : ' + previous + ' pts';
       $('#pz-win-det').textContent = mmss + ' · ' + result.round + (result.round > 1 ? ' manches' : ' manche');
+      this.offerNextColumn(result.round === 1);
       $('#pz-win').style.display = 'block';
+    }
+
+    // Facile : après une grille SANS FAUTE (réussie en une seule manche), une colonne s'ajoute.
+    // Sinon on rejoue la même grille.
+    offerNextColumn(flawless) {
+      const again = $('#pz-again'), next = $('#pz-next'), chips = $('#pz-next-chips');
+      this.nextAdd = null;
+      next.style.display = 'none'; chips.innerHTML = '';
+      again.style.display = ''; again.textContent = 'Rejouer';
+      if (this.prefs.level !== 'easy') return;
+
+      const choices = flawless ? this.nextChoices() : [];
+      if (!choices.length) return;
+
+      const chars = this.prefs.script === 'h' ? H : K;
+      const labelOf = i => chars[ALL_COLS[i].s.find(Boolean)] + ' ' + ALL_COLS[i].label;
+      if (choices.length === 1) {
+        this.nextAdd = choices[0];
+        again.textContent = 'Continuer : + ' + labelOf(choices[0]);
+        return;
+      }
+      // plusieurs colonnes possibles : le joueur choisit, ce qui lance directement la grille suivante
+      again.style.display = 'none';
+      next.style.display = 'block';
+      choices.forEach(i => {
+        const chip = el('button', 'pz-chip');
+        chip.appendChild(el('span', 'k', chars[ALL_COLS[i].s.find(Boolean)]));
+        chip.appendChild(el('span', 'l', ALL_COLS[i].label));
+        chip.onclick = () => { this.curCols.push(i); this.startGame(); };
+        chips.appendChild(chip);
+      });
     }
 
     // ═════════ Compteurs ═════════

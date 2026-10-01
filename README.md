@@ -27,7 +27,7 @@ Fonctionne hors-ligne une fois installé comme PWA.
 - Une grille vide en haut, une pile de cartes mélangées et tournées en bas, à placer par glisser-déposer
 - Vérification quand la grille est pleine : vert (bien placée), jaune (bonne colonne), orange (bonne ligne), rouge (ni l'une ni l'autre)
 - Clignotement des cartes fausses pendant 10 s, puis retour dans la pile ; les cartes vertes restent verrouillées
-- Trois niveaux : Facile (5 colonnes au choix), Moyen (46 kanas), Difficile (71 kanas avec dakuten)
+- Trois niveaux : Facile (on choisit les colonnes de départ, une colonne s'ajoute à chaque grille sans faute), Moyen (46 kanas), Difficile (71 kanas avec dakuten)
 - Score : 10 points par carte, moins 1 point par seconde ; meilleur score conservé par alphabet, niveau et colonnes
 - Bouton œil pour masquer les noms des colonnes et lignes
 
