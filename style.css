@@ -379,7 +379,8 @@ body {
 .eye-btn .eye-off { display: none; }
 .eye-btn.active .eye-on { display: none; }
 .eye-btn.active .eye-off { display: block; }
-#grid-zone.romaji-off .cell .rhint { visibility: hidden; }
+#grid-zone.romaji-off .cell .rhint,
+#grid-zone.romaji-off .col-hdr { visibility: hidden; }
 /* Dans la barre des scores : l'œil se range à droite, collé au bouton « Colonnes » */
 #score-bar .eye-btn { width: 26px; height: 26px; margin-left: auto; }
 #score-bar .eye-btn svg { width: 15px; height: 15px; }
