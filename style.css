@@ -143,20 +143,9 @@ body {
 .cell.empty-slot { background: transparent; border: none; }
 .cell.drag-over  { border-color: var(--purple); background: var(--purple-light); z-index: 20; }
 
-/* Effet loupe : la case survolée (doigt qui glisse une carte, ou souris) s'agrandit en une bulle.
-   C'est un ::before sans pointer-events : la case garde sa vraie taille pour la détection du doigt. */
-.kana-col { overflow: visible; }
-.cell.drag-over::before {
-  content: attr(data-romaji); pointer-events: none;
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: calc(var(--cell-size, 56px) * 2.3); height: calc(var(--cell-size, 56px) * 2.3); max-width: 84px; max-height: 84px; min-width: 40px; min-height: 40px;
-  display: flex; align-items: center; justify-content: center; border-radius: 16px;
-  background: var(--purple-light); border: 2px solid var(--purple); box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  font-size: 20px; font-weight: 700; color: var(--purple); z-index: 30;
-}
-#grid-zone.romaji-off .cell.drag-over::before { content: ''; }
-.cell.empty-slot::before { display: none !important; }
-@media (hover: hover) { .cell:hover { z-index: 20; } .cell:hover::before { content: attr(data-romaji); pointer-events: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: var(--purple-light); border: 2px solid var(--purple); box-shadow: 0 6px 18px rgba(0,0,0,.25); font-size: 18px; font-weight: 700; color: var(--purple); z-index: 30; } #grid-zone.romaji-off .cell:hover::before { content: ''; } }
+/* Zoom de toute la grille pendant le glisser (voir startGridZoom dans game.js) */
+#grid.zooming { transform: scale(var(--zoom, 2)); transition: transform 0.12s ease-out; will-change: transform; }
+#grid.zooming .cell { transition: none; }
 .cell.correct    { border: 2px solid var(--green); background: var(--green-light); cursor: default; }
 .cell.wrong      { border: 2px solid var(--red); background: var(--red-light); animation: shake 0.3s; }
 .cell.highlight  { border: 2px solid var(--amber-mid); background: var(--amber-light); animation: pulse 0.5s 4; }
@@ -235,10 +224,10 @@ body {
 
 /* ── Cartes ── */
 .card {
-  width: 78px; height: 78px; flex-shrink: 0;
+  width: var(--card-size, 78px); height: var(--card-size, 78px); flex-shrink: 0;
   border-radius: 12px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-size: 35px; cursor: grab;
+  font-size: calc(var(--card-size, 78px) * 0.62); cursor: grab;
   border: 1px solid var(--border); background: var(--bg);
   box-shadow: 0 2px 6px rgba(0,0,0,0.07);
   transition: transform 0.12s;
@@ -248,10 +237,10 @@ body {
 .card.card-hira          { border-color: var(--purple); background: var(--purple-light); }
 .card.card-kata          { border-color: var(--kata-accent); background: var(--kata-accent-light); }
 .card.retry-card        { border-color: var(--amber-mid); background: var(--amber-light); }
-.card.flipped           { font-size: 19px; font-weight: 600; color: var(--purple); background: var(--purple-light); border-color: var(--purple); }
+.card.flipped           { font-size: calc(var(--card-size, 78px) * 0.27); font-weight: 600; color: var(--purple); background: var(--purple-light); border-color: var(--purple); }
 .card.selected          { border: 2px solid var(--purple); background: var(--purple-light); box-shadow: 0 0 0 3px #E8C5FF; }
 .card.dragging          { opacity: 0.3; }
-.card .card-romaji      { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.card .card-romaji      { font-size: calc(var(--card-size, 78px) * 0.17); color: var(--text3); margin-top: 2px; }
 
 .err-badge {
   display: none; position: absolute; top: -5px; right: -5px;

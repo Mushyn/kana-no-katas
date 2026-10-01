@@ -91,6 +91,12 @@ function calcCellSize() {
 
   // Plancher de 14 px (comme le puzzle) : en dessous, la grille redevient défilable plutôt que illisible
   const size = Math.max(14, Math.min(hSize, wSize));
+  // Cartes du paquet : aussi grandes que la zone du bas le permet (au moins 78 px, au plus 128 px)
+  const deck = document.getElementById('deck-scroll');
+  if (deck) {
+    const dh = deck.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--card-size', Math.max(78, Math.min(128, Math.floor(dh - 24))) + 'px');
+  }
   // Case plus haute que large quand la largeur est le facteur limitant (comme le puzzle : --cw / --ch)
   document.documentElement.style.setProperty('--cell-h', Math.max(size, Math.min(hSize, Math.round(size * 1.6))) + 'px');
   return size;
@@ -106,6 +112,31 @@ function countVisibleColumns() {
     cols++;
   });
   return { cols, seps };
+}
+
+// ── Zoom de la grille pendant le glisser d'une carte ──
+// Toute la grille s'agrandit autour du doigt (transform-origin = position du doigt) : les cases voisines deviennent
+// lisibles. Le point sous le doigt ne bouge pas, donc la case visée reste la même qu'au repos ;
+// elementFromPoint tient compte du zoom et continue de trouver la bonne case.
+let gridZoomBox = null;
+function startGridZoom() {
+  const grid = document.getElementById('grid');
+  gridZoomBox = grid.getBoundingClientRect();           // mesuré avant tout zoom
+  const cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-size')) || 44;
+  const z = Math.min(3.2, Math.max(1.8, 46 / cell));    // cases d'au moins ~46 px à l'écran
+  grid.style.setProperty('--zoom', z.toFixed(2));
+  grid.classList.add('zooming');
+}
+function moveGridZoom(x, y) {
+  if (!gridZoomBox) return;
+  const grid = document.getElementById('grid');
+  grid.style.transformOrigin = (x - gridZoomBox.left) + 'px ' + (y - gridZoomBox.top) + 'px';
+}
+function endGridZoom() {
+  const grid = document.getElementById('grid');
+  grid.classList.remove('zooming');
+  grid.style.transformOrigin = '';
+  gridZoomBox = null;
 }
 
 // ── Grille ──
@@ -257,6 +288,7 @@ function renderDeck() {
         el.style.zIndex = '1000';
         el.style.pointerEvents = 'none';
         el.classList.add('dragging');
+        startGridZoom();
         document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
         selectedCard = null;
       }
@@ -264,6 +296,7 @@ function renderDeck() {
         e.preventDefault(); // empêche le scroll de la page pendant le glisser
         el.style.left = (parseFloat(el.dataset.ox) + dx) + 'px';
         el.style.top = (parseFloat(el.dataset.oy) + dy) + 'px';
+        moveGridZoom(t.clientX, t.clientY);
         document.querySelectorAll('.cell.drag-over').forEach(c => c.classList.remove('drag-over'));
         const under = document.elementFromPoint(t.clientX, t.clientY);
         const cellUnder = under && under.closest('.cell');
@@ -278,12 +311,11 @@ function renderDeck() {
         el.style.position = ''; el.style.left = ''; el.style.top = '';
         el.style.zIndex = ''; el.style.pointerEvents = ''; el.style.width = '';
         el.classList.remove('dragging');
-        if (!locked) {
-          const t = e.changedTouches[0];
-          const under = document.elementFromPoint(t.clientX, t.clientY);
-          const cellUnder = under && under.closest('.cell');
-          if (cellUnder) handleDrop(cellUnder, card.id);
-        }
+        const t = e.changedTouches[0];
+        const under = document.elementFromPoint(t.clientX, t.clientY);
+        const cellUnder = under && under.closest('.cell');
+        endGridZoom();
+        if (!locked && cellUnder) handleDrop(cellUnder, card.id);
       }
       // Si ce n'était qu'un tap (touchMoved === false), on ne fait rien ici :
       // le click synthétisé par le navigateur prendra le relais normalement
