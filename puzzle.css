@@ -94,6 +94,7 @@
   width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0; border: 2px solid;
   display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;
 }
+.pz-sw svg { width: 15px; height: 15px; display: block; }
 .pz-sw.green  { border-color: var(--c-green);  color: var(--c-green);  background: color-mix(in srgb, var(--c-green) 28%, var(--bg)); }
 .pz-sw.yellow { border-color: var(--c-yellow); color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 28%, var(--bg)); }
 .pz-sw.orange { border-color: var(--c-orange); color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 28%, var(--bg)); }
@@ -133,6 +134,7 @@
 #pz-layer.shaking .pz-card { transition: none; }
 .pz-card.locked { cursor: default; }
 .pz-card .badge { position: absolute; right: 1px; bottom: 0; font-size: 9px; font-weight: 800; line-height: 1; }
+.pz-card .badge svg { width: 10px; height: 10px; display: block; }
 .pz-card.k-green  { border-color: var(--c-green);  background: color-mix(in srgb, var(--c-green) 28%, var(--bg)); }
 .pz-card.k-yellow { border-color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 28%, var(--bg)); }
 .pz-card.k-orange { border-color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 28%, var(--bg)); }

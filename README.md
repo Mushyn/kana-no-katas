@@ -1,7 +1,7 @@
 # Kana no Katas — Hiragana & Katakana
 
 Application d'apprentissage des kanas japonais avec quatre jeux : le tableau (glisser-déposer avec répétition espacée, SRS), le tracé (écriture à la main), le puzzle (reconstituer le tableau) et la lecture (lire des mots illustrés par une photo).  
-L'application s'ouvre sur un menu (`menu.html`) qui propose les quatre jeux ; chaque jeu a une flèche ← pour y revenir.  
+L'application s'ouvre sur un menu (`menu.html`) : c'est le pivot de la navigation. Il propose les quatre jeux, le réglage des colonnes connues (commun à tous les jeux) et la page « Mes scores » ; chaque jeu a une flèche ← pour y revenir. Les jeux ne se renvoient plus les uns aux autres.  
 Fonctionne hors-ligne une fois installé comme PWA.
 
 ## Fonctionnalités
@@ -15,7 +15,7 @@ Fonctionne hors-ligne une fois installé comme PWA.
 - Bouton œil : affiche ou masque les sons (romaji) de la grille
 - Double clic sur une carte → révèle le romaji
 - Erreur → feedback 2s + réinjection dans ~15 cartes (SRS)
-- Bilan de session avec kanas à retravailler
+- Bilan de fin de partie avec kanas à retravailler (la progression complète est dans « Mes scores »)
 
 ### Jeu 2 : le tracé (`trace.html`)
 
@@ -100,6 +100,11 @@ kana-no-katas/
 ├── index.html          # Jeu 1 : le tableau
 ├── menu.html           # Page d'accueil : choix du jeu (quatre cartes)
 ├── menu.css            # Styles du menu
+├── menu.js             # Menu : réglage des colonnes connues
+├── scores.html         # Page « Mes scores » (progression des quatre jeux)
+├── scores.css          # Styles de la page de scores
+├── scores.js           # Mise en forme du résumé de progression
+├── shared.js           # Mémoire commune : colonnes choisies + progression (sans DOM, testable)
 ├── style.css           # Styles + dark mode
 ├── data.js             # Tables hiragana / katakana
 ├── game.js             # Logique du jeu 1 + SRS
@@ -116,7 +121,7 @@ kana-no-katas/
 ├── vocab-data.js       # Liste des mots et liens des photos
 ├── viewport.js         # Hauteur d'affichage mesurée + réglage manuel
 ├── guide/              # Guide d'apprentissage utilisateur
-├── tests/              # Tests des modèles (puzzle, lecture)
+├── tests/              # Tests des modèles et du module commun (puzzle, lecture, shared)
 ├── manifest.json       # Config PWA
 ├── sw.js               # Service Worker (cache offline)
 └── icons/
@@ -129,6 +134,7 @@ kana-no-katas/
 ```bash
 node --test tests/puzzle-model.test.js
 node --test tests/lecture-model.test.js
+node --test tests/shared.test.js
 ```
 
 ## Évolutions prévues

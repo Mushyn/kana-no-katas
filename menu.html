@@ -54,10 +54,39 @@
       <span class="txt"><span class="name">La lecture</span><span class="desc">Lis des mots illustrés par une photo, sans chrono</span></span>
     </a>
 
+    <!-- Colonnes que je connais : un seul réglage, valable pour tous les jeux -->
+    <section class="mn-cols">
+      <button class="mn-cols-head" id="mn-cols-toggle" aria-expanded="false">
+        <span class="t">Mes colonnes</span><span class="n" id="mn-cols-count"></span><span class="chev">▾</span>
+      </button>
+      <div id="mn-cols-panel" hidden>
+        <p class="mn-note">Ce réglage vaut pour tous les jeux : seuls les kanas de ces colonnes sont proposés.</p>
+        <div class="mn-chips" id="mn-cols-base"></div>
+        <div class="mn-sub">Dakuten et handakuten</div>
+        <div class="mn-chips" id="mn-cols-dak"></div>
+        <div class="mn-btns">
+          <button id="mn-all">Toutes</button>
+          <button id="mn-base">Hiragana de base</button>
+          <button id="mn-none">Aucune</button>
+        </div>
+      </div>
+    </section>
+
+    <a class="menu-card slim" href="scores.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </span>
+      <span class="txt"><span class="name">Mes scores</span><span class="desc">Ma progression dans les quatre jeux</span></span>
+    </a>
+
     <div class="menu-guide"><a href="guide/index.html">Guide d'apprentissage</a></div>
   </div>
 
 </div>
+
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script src="menu.js"></script>
 
 <div id="sw-update-banner" style="display:none;">
   <span>✨ Nouvelle version disponible</span>

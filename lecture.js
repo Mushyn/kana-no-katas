@@ -97,7 +97,8 @@
   class LectureApp {
     constructor() {
       // Préférences mémorisées : colonnes choisies, taille de séance, œil, mots à revoir
-      this.prefs = loadJSON(PREFS_KEY, { picked: [0, 1, 2], size: 5, romaji: false, review: [] });
+      this.prefs = loadJSON(PREFS_KEY, { size: 5, romaji: false, review: [] });
+      this.prefs.picked = KanaStore.columnsAsIndexes(ALL_COLS);   // colonnes connues : réglage commun à tous les jeux (shared.js)
       this.pool = [];         // mots jouables avec les colonnes choisies
       this.session = [];      // mots de la séance en cours
       this.game = null;       // LectureGame (modèle)
@@ -161,6 +162,7 @@
       const set = this.picked;
       if (set.has(i)) set.delete(i); else set.add(i);
       this.prefs.picked = [...set].sort((a, b) => a - b);
+      KanaStore.setColumnsFromIndexes(ALL_COLS, this.prefs.picked);
       this.save();
       this.refreshSelect();
     }
@@ -289,6 +291,7 @@
         const r = this.game.results.get(m.kana);
         if (r === false) review.add(m.kana);
         else if (r === true) review.delete(m.kana);
+        if (r !== undefined) KanaStore.recordLecture(m.kana, r === true);
       });
       this.prefs.review = [...review];
       this.save();

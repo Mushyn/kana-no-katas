@@ -1,7 +1,9 @@
 // ── État global ──
 let mode = 'both';
-let selectedCols = null; // null = toutes les colonnes
-let showDiacritics = false; // dakuten + handakuten
+// Colonnes connues : réglage commun à tous les jeux (voir shared.js). Identifiant d'une colonne : KanaStore.colKey(col).
+let selectedCols = KanaStore.columns();
+const isDiacriticKey = key => COLS.some(c => c.diacritic && KanaStore.colKey(c) === key);
+let showDiacritics = selectedCols.some(isDiacriticKey); // dakuten + handakuten : affichés dès qu'une de leurs colonnes est choisie
 let deckSize = 1;
 let showRomaji = false;
 let score = { ok: 0, err: 0 };
@@ -37,6 +39,9 @@ function shuffle(arr) {
 
 function toggleDiacritics(btn) {
   showDiacritics = !showDiacritics;
+  const dia = COLS.filter(c => c.diacritic).map(c => KanaStore.colKey(c));
+  selectedCols = showDiacritics ? [...new Set(selectedCols.concat(dia))] : selectedCols.filter(k => !dia.includes(k));
+  KanaStore.setColumns(selectedCols);
   btn.classList.toggle('active', showDiacritics);
   btn.setAttribute('aria-pressed', showDiacritics ? 'true' : 'false');
   document.getElementById('diac-switch-state').textContent = showDiacritics ? 'on' : 'off';
@@ -57,7 +62,7 @@ function buildFullDeck() {
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') return;
     if (!showDiacritics && col.diacritic) return;
-    if (selectedCols && !selectedCols.includes(col.label + (col.diacritic ? col.s[0] : ''))) return;
+    if (!selectedCols.includes(KanaStore.colKey(col))) return;
     col.s.forEach(v => {
       if (!v) return;
       if (mode === 'both' || mode === 'hiragana')
@@ -108,7 +113,7 @@ function countVisibleColumns() {
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') { if (showDiacritics) seps++; return; }
     if (!showDiacritics && col.diacritic) return;
-    if (selectedCols && !selectedCols.includes(col.label + (col.diacritic ? col.s[0] : ''))) return;
+    if (!selectedCols.includes(KanaStore.colKey(col))) return;
     cols++;
   });
   return { cols, seps };
@@ -187,7 +192,7 @@ function buildGrid() {
       return;
     }
     if (!showDiacritics && col.diacritic) return;
-    if (selectedCols && !selectedCols.includes(col.label + (col.diacritic ? col.s[0] : ''))) return;
+    if (!selectedCols.includes(KanaStore.colKey(col))) return;
     const colEl = document.createElement('div');
     colEl.className = 'kana-col';
 
@@ -388,6 +393,7 @@ function handleDrop(cell, cardId) {
 
   if (card.romaji === romaji) {
     score.ok++;
+    KanaStore.recordTableau(card.type, card.romaji, true);
     activeDeck.splice(idx, 1);
     fullDeck = fullDeck.filter(c => c.id !== cardId);
 
@@ -409,6 +415,7 @@ function handleDrop(cell, cardId) {
 
   } else {
     score.err++;
+    KanaStore.recordTableau(card.type, card.romaji, false);
     card.errors = (card.errors || 0) + 1;
     errorMap[card.id] = { card, count: card.errors };
     cell.classList.add('wrong');
@@ -514,14 +521,11 @@ function showBilan() {
   document.getElementById('bilan').style.display = 'block';
 }
 
-function closeBilan() { document.getElementById('bilan').style.display = 'none'; }
-
 // ── Contrôles ──
 function setMode(m, btn) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  saveConfigForTrace();
   resetGame();
 }
 
@@ -550,6 +554,12 @@ function resetGame() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // État du bouton « Diacritiques » et du libellé des colonnes, d'après le réglage commun
+  const dbtn = document.getElementById('diac-switch');
+  dbtn.classList.toggle('active', showDiacritics);
+  dbtn.setAttribute('aria-pressed', showDiacritics ? 'true' : 'false');
+  document.getElementById('diac-switch-state').textContent = showDiacritics ? 'on' : 'off';
+  updateColLabel();
   // Attendre que le layout soit calculé avant de mesurer les hauteurs
   requestAnimationFrame(() => {
     requestAnimationFrame(() => resetGame());
@@ -568,10 +578,10 @@ function buildColSelector() {
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') return;
     if (!showDiacritics && col.diacritic) return;
-    const key = col.label + (col.diacritic ? col.s[0] : '');
+    const key = KanaStore.colKey(col);
     const firstKana = col.s.find(v => v);
     const char = (mode === 'katakana' ? K[firstKana] : H[firstKana]) || firstKana || '';
-    const isChecked = !selectedCols || selectedCols.includes(key);
+    const isChecked = selectedCols.includes(key);
     const el = document.createElement('div');
     el.className = 'col-check' + (isChecked ? ' checked' : '');
     el.dataset.key = key;
@@ -597,14 +607,19 @@ function selectNoneCols() {
 }
 
 function applyColSelection() {
-  const allChecks = document.querySelectorAll('.col-check');
   const checked = [...document.querySelectorAll('.col-check.checked')].map(el => el.dataset.key);
-  selectedCols = checked.length === allChecks.length ? null : checked;
-  const label = document.getElementById('col-selector-label');
-  label.textContent = selectedCols ? `${checked.length} col. ▾` : 'Colonnes ▾';
+  // Les colonnes avec dakuten, masquées dans le panneau quand le bouton est sur « off », ne sont jamais dans la sélection
+  selectedCols = checked;
+  KanaStore.setColumns(selectedCols);
+  updateColLabel();
   document.getElementById('col-selector-panel').style.display = 'none';
-  saveConfigForTrace();
   resetGame();
+}
+
+function updateColLabel() {
+  const visible = COLS.filter(c => c.label !== 'SEP' && c.label !== 'SEP2' && (showDiacritics || !c.diacritic)).length;
+  const n = selectedCols.filter(k => showDiacritics || !isDiacriticKey(k)).length;
+  document.getElementById('col-selector-label').textContent = n === visible ? 'Colonnes ▾' : n + ' col. ▾';
 }
 
 // ── Œil : afficher / masquer les sons (romaji) dans la grille ──
@@ -630,9 +645,3 @@ document.addEventListener('DOMContentLoaded', () => {
   applyGridRomaji(hidden);
 });
 
-// ── Transmettre la config au jeu de tracé via localStorage ──
-function saveConfigForTrace() {
-  try {
-    localStorage.setItem('kana-game-config', JSON.stringify({ mode, selectedCols }));
-  } catch (e) { /* localStorage indisponible : on ignore silencieusement */ }
-}

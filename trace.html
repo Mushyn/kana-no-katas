@@ -381,11 +381,12 @@
 </div>
 
 <script src="data.js"></script>
+<script src="shared.js"></script>
 <script>
 let REF_STROKES = null;
 
 let currentMode = 'hiragana';
-let tSelectedCols = null;
+let tSelectedCols = KanaStore.columns();   // colonnes connues : réglage commun à tous les jeux (shared.js)
 let tFullDeck = [], tCurrentCard = null;
 let tScore = { ok: 0, err: 0 };
 let tErrorMap = {};
@@ -405,8 +406,8 @@ fetch('strokes/reference_strokes.json')
 function buildTraceableDeck() {
   const cards = [];
   TRACEABLE_COLS.forEach(col => {
-    const key = col.label;
-    if (tSelectedCols && !tSelectedCols.includes(key)) return;
+    const key = KanaStore.colKey(col);
+    if (!tSelectedCols.includes(key)) return;
     col.s.forEach(v => {
       if (!v) return;
       const folder = currentMode === 'katakana' ? 'k' : 'h';
@@ -630,6 +631,7 @@ function validateTrace() {
   const { pct, orderOk } = compareStrokes(userNorm, refStrokes);
 
   tResultsLog.push({ romaji: tCurrentCard.romaji, pct });
+  KanaStore.recordTrace(folder, tCurrentCard.romaji, pct);
 
   const isGood = pct >= 60;
   if (isGood) { tScore.ok++; }
@@ -859,10 +861,10 @@ function buildTColSelector() {
   const container = document.getElementById('tcol-checkboxes');
   container.innerHTML = '';
   TRACEABLE_COLS.forEach(col => {
-    const key = col.label;
+    const key = KanaStore.colKey(col);
     const firstKana = col.s.find(v => v);
     const char = (currentMode === 'katakana' ? K[firstKana] : H[firstKana]) || firstKana || '';
-    const isChecked = !tSelectedCols || tSelectedCols.includes(key);
+    const isChecked = tSelectedCols.includes(key);
     const el = document.createElement('div');
     el.className = 'tcol-check' + (isChecked ? ' checked' : '');
     el.dataset.key = key;
@@ -891,24 +893,19 @@ function toggleColSelector() {
 function selectAllTCols() { document.querySelectorAll('.tcol-check').forEach(el => el.classList.add('checked')); }
 function selectNoneTCols() { document.querySelectorAll('.tcol-check').forEach(el => el.classList.remove('checked')); }
 function applyTColSelection() {
-  const allChecks = document.querySelectorAll('.tcol-check');
   const checked = [...document.querySelectorAll('.tcol-check.checked')].map(el => el.dataset.key);
-  tSelectedCols = checked.length === allChecks.length ? null : checked;
-  const label = document.getElementById('tcol-selector-label');
-  label.textContent = tSelectedCols ? `${checked.length} col. ▾` : 'Colonnes ▾';
+  // Le tracé ne propose que les colonnes de base : les colonnes avec dakuten déjà choisies dans le réglage commun sont conservées
+  const traceKeys = TRACEABLE_COLS.map(c => KanaStore.colKey(c));
+  tSelectedCols = checked;
+  KanaStore.setColumns(KanaStore.columns().filter(k => !traceKeys.includes(k)).concat(checked));
+  updateTColLabel();
   document.getElementById('tcol-selector-panel').style.display = 'none';
   resetTrace();
 }
 
-function loadConfigFromCardGame() {
-  try {
-    const raw = localStorage.getItem('kana-game-config');
-    if (!raw) return false;
-    const cfg = JSON.parse(raw);
-    if (cfg.mode === 'katakana' || cfg.mode === 'hiragana') currentMode = cfg.mode;
-    if (cfg.selectedCols) tSelectedCols = cfg.selectedCols;
-    return true;
-  } catch (e) { return false; }
+function updateTColLabel() {
+  const n = TRACEABLE_COLS.filter(c => tSelectedCols.includes(KanaStore.colKey(c))).length;
+  document.getElementById('tcol-selector-label').textContent = n === TRACEABLE_COLS.length ? 'Colonnes ▾' : n + ' col. ▾';
 }
 
 // Bouton « hauteur de l'affichage » : cycle plein -> réduit -> plus réduit (voir viewport.js)
@@ -920,13 +917,7 @@ function onViewBtn(btn) {
 
 function init() {
   document.getElementById('view-btn').classList.toggle('active', getViewLevel() > 0);
-  const cameFromGame = loadConfigFromCardGame();
-  if (cameFromGame) {
-    document.querySelectorAll('#trace-mode-toggle .mode-btn').forEach(b => {
-      const isHira = b.textContent.trim() === 'ひ';
-      b.classList.toggle('active', (currentMode === 'katakana' && !isHira) || (currentMode !== 'katakana' && isHira));
-    });
-  }
+  updateTColLabel();
   buildTColSelector();
   requestAnimationFrame(() => {
     resizeCanvas();

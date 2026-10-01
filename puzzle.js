@@ -45,6 +45,7 @@
       // Préférences mémorisées (alphabet, niveau, colonnes de départ du niveau Facile, œil)
       this.prefs = loadJSON(PREFS_KEY, { script: 'h', level: 'mid', picked: [0], hints: true });
       this.best = loadJSON(BEST_KEY, {});
+      this.prefs.picked = KanaStore.columnsAsIndexes(ALL_COLS);   // colonnes connues : réglage commun à tous les jeux (shared.js)
 
       this.curCols = [];         // Facile : colonnes jouées dans la partie en cours (elles s'allongent au fil des grilles sans faute)
       this.nextAdd = null;       // Facile : colonne qui sera ajoutée d'office à la prochaine grille (null = pas d'ajout automatique)
@@ -174,6 +175,7 @@
       const set = this.picked;
       if (set.has(i)) set.delete(i); else set.add(i);
       this.prefs.picked = [...set].sort((a, b) => a - b);
+      KanaStore.setColumnsFromIndexes(ALL_COLS, this.prefs.picked);
       this.save();
       this.buildLevels();     // le meilleur score dépend des colonnes choisies
       this.buildPicker();
@@ -467,11 +469,18 @@
     verify() {
       this.phase = 'check';
       const result = this.game.check();                // le modèle compare avec les bonnes cases
-      const symbols = { green: '✓', yellow: '↕', orange: '↔', red: '✗' };
+      // Symboles dessinés en SVG (pas de caractères ↕ ↔ : iOS les affiche en emoji)
+      const icons = {
+        green: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>',
+        yellow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/></svg>',
+        orange: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg>',
+        red: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+      };
       result.results.forEach(({ cardId, status }) => {
         const card = this.cards.get(cardId);
         card.classList.add('k-' + status);
-        card.appendChild(el('span', 'badge', symbols[status]));   // symbole en plus de la couleur (daltonisme)
+        const badge = el('span', 'badge'); badge.innerHTML = icons[status];   // symbole en plus de la couleur (daltonisme)
+        card.appendChild(badge);
         if (status === 'green') card.classList.add('locked');
       });
       this.updateHud();

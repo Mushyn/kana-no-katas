@@ -91,18 +91,6 @@
       <button onclick="drawMore()" aria-label="Ajouter des cartes" title="Ajouter des cartes">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
-      <button onclick="showBilan()" aria-label="Bilan" title="Bilan">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      </button>
-      <button onclick="window.location.href='trace.html'" aria-label="Tracé" title="Tracé">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
-      </button>
-      <button onclick="window.location.href='puzzle.html'" aria-label="Puzzle" title="Puzzle">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2" transform="rotate(12 17.5 17.5)"/></svg>
-      </button>
-      <button onclick="window.location.href='lecture.html'" aria-label="Lecture" title="Lecture">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-      </button>
     </div>
   </div>
 
@@ -116,7 +104,7 @@
 
   <!-- Bilan -->
   <div id="bilan">
-    <h2>Bilan de session</h2>
+    <h2>Bien joué !</h2>
     <div class="bilan-stats">
       <div class="bstat ok"><div class="val" id="b-ok">0</div><div class="lbl">Réussis</div></div>
       <div class="bstat err"><div class="val" id="b-err">0</div><div class="lbl">Erreurs</div></div>
@@ -130,13 +118,13 @@
       <h3>Maîtrisés</h3>
       <div class="bilan-grid" id="b-ok-grid"></div>
     </div>
-    <button onclick="closeBilan()">← Continuer</button>
-    <button onclick="window.location.href='trace.html'" class="bilan-trace-btn">✏️ S'entraîner au tracé</button>
-    <button onclick="window.location.href='puzzle.html'" class="bilan-trace-btn">Jouer au puzzle</button>
     <button onclick="resetGame()">↺ Recommencer</button>
+    <button onclick="window.location.href='scores.html'" class="bilan-trace-btn">Mes scores</button>
+    <button onclick="window.location.href='menu.html'">Menu des jeux</button>
   </div>
 
 <script src="data.js"></script>
+<script src="shared.js"></script>
 <script src="game.js"></script>
 <div id="sw-update-banner" style="display:none;">
   <span>✨ Nouvelle version disponible</span>

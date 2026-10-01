@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kana no Katas — Mes scores</title>
+  <meta name="theme-color" content="#A855F7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="menu.css" />
+  <link rel="stylesheet" href="scores.css" />
+  <script src="viewport.js"></script>
+</head>
+<body>
+<div id="menu-app">
+
+  <div class="menu-top">
+    <div class="sc-left">
+      <a class="hd-back" href="menu.html" aria-label="Retour au menu des jeux" title="Menu des jeux">←</a>
+      <h1>かな の 型</h1>
+    </div>
+  </div>
+
+  <div class="menu-body" id="sc-body">
+    <div class="menu-title">
+      <div class="big">Mes scores</div>
+      <p id="sc-since"></p>
+    </div>
+
+    <section class="sc-card" id="sc-tableau">
+      <h2>Le tableau</h2>
+      <div class="sc-stats" id="sc-tableau-stats"></div>
+      <div id="sc-tableau-work"></div>
+    </section>
+
+    <section class="sc-card" id="sc-trace">
+      <h2>Le tracé</h2>
+      <div class="sc-stats" id="sc-trace-stats"></div>
+      <div id="sc-trace-work"></div>
+    </section>
+
+    <section class="sc-card" id="sc-puzzle">
+      <h2>Le puzzle</h2>
+      <div id="sc-puzzle-list"></div>
+    </section>
+
+    <section class="sc-card" id="sc-lecture">
+      <h2>La lecture</h2>
+      <div class="sc-stats" id="sc-lecture-stats"></div>
+      <div id="sc-lecture-review"></div>
+    </section>
+
+    <div class="sc-reset">
+      <button id="sc-reset" class="sc-danger">Tout remettre à zéro</button>
+      <div id="sc-confirm" hidden>
+        <p>Effacer tous les scores, les records et les mots à revoir de cet appareil ? Les colonnes choisies sont conservées.</p>
+        <div class="sc-confirm-btns">
+          <button id="sc-cancel">Annuler</button>
+          <button id="sc-yes" class="sc-danger">Oui, effacer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-guide"><a href="guide/index.html">Guide d'apprentissage</a></div>
+  </div>
+
+</div>
+
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script src="scores.js"></script>
+
+<div id="sw-update-banner" style="display:none;">
+  <span>✨ Nouvelle version disponible</span>
+  <button onclick="applySwUpdate()">Mettre à jour</button>
+</div>
+<script>
+  // Détection de mise à jour PWA (même mécanisme que les autres pages)
+  let swRegistration = null;
+  function showUpdateBanner() { document.getElementById('sw-update-banner').style.display = 'flex'; }
+  function applySwUpdate() {
+    if (!swRegistration || !swRegistration.waiting) return;
+    swRegistration.waiting.postMessage('SKIP_WAITING');
+  }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {
+          swRegistration = reg;
+          if (reg.waiting) showUpdateBanner();
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing; if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
+            });
+          });
+        })
+        .catch(e => console.warn('SW KO', e));
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return; refreshing = true; window.location.reload();
+      });
+      setInterval(() => { if (swRegistration) swRegistration.update(); }, 60 * 60 * 1000);
+    });
+  }
+</script>
+</body>
+</html>
