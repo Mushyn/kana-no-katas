@@ -119,59 +119,31 @@ function countVisibleColumns() {
   return { cols, seps };
 }
 
-// ── Loupe pendant le glisser d'une carte ──
-// La grille ne bouge pas. Une loupe (bulle fixe) montre, agrandies, la case visée et ses 8 voisines (3 x 3).
-// Les vraies cases restent seules à recevoir le doigt : la loupe n'intercepte aucun toucher (pointer-events: none).
-let lensEl = null, lensCenter = null;
-const LENS_CELL = 54, LENS_GAP = 4;
+// ── Zoom global de la grille pendant le glisser d'une carte ──
+// Toute la grille est agrandie autour du doigt : le point de la grille sous le doigt ne bouge pas,
+// et le reste s'écarte autour. Le zoom est calculé d'après la taille d'une case (plus la grille est dense, plus on agrandit).
+let gridZoomBox = null;   // position de la grille mesurée AVANT le zoom
 
-function startGridZoom() { /* la loupe est créée au premier déplacement */ }
+function startGridZoom() {
+  const grid = document.getElementById('grid');
+  gridZoomBox = grid.getBoundingClientRect();
+  const cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-size')) || 44;
+  const z = Math.min(3.2, Math.max(1.8, 46 / cell));
+  grid.style.setProperty('--zoom', z.toFixed(2));
+  grid.classList.add('zooming');
+}
+
+// Le centre du zoom suit le doigt (coordonnées relatives à la grille non zoomée)
+function moveGridZoom(x, y) {
+  if (!gridZoomBox) return;
+  document.getElementById('grid').style.transformOrigin = (x - gridZoomBox.left) + 'px ' + (y - gridZoomBox.top) + 'px';
+}
+
 function endGridZoom() {
-  if (lensEl) { lensEl.remove(); lensEl = null; }
-  lensCenter = null;
-}
-
-function updateLens(x, y, cellUnder) {
-  if (!cellUnder || cellUnder.classList.contains('empty-slot')) { if (lensEl) lensEl.style.display = 'none'; return; }
-  if (!lensEl) {
-    lensEl = document.createElement('div');
-    lensEl.id = 'lens';
-    document.body.appendChild(lensEl);
-  }
-  lensEl.style.display = 'grid';
-  // On ne reconstruit le contenu que si la case visée change
-  if (lensCenter !== cellUnder) { lensCenter = cellUnder; fillLens(cellUnder); }
-  // Position : au-dessus du doigt (et de la carte glissée), sinon en dessous si on est trop haut
-  const size = 3 * LENS_CELL + 2 * LENS_GAP + 16;
-  const left = Math.max(6, Math.min(window.innerWidth - size - 6, x - size / 2));
-  let top = y - 76 - size;
-  if (top < 4) top = y + 76;
-  lensEl.style.left = left + 'px';
-  lensEl.style.top = top + 'px';
-}
-
-// Remplit la loupe avec des copies des 3 x 3 cases autour de la case visée
-function fillLens(center) {
-  const colEl = center.parentElement;
-  const cols = [...document.querySelectorAll('#grid > .kana-col')];   // ordre du DOM : de la droite vers la gauche
-  const ci = cols.indexOf(colEl);
-  const rows = [...colEl.querySelectorAll('.cell')];
-  const ri = rows.indexOf(center);
-  lensEl.innerHTML = '';
-  lensEl.style.setProperty('--cell-size', LENS_CELL + 'px');
-  lensEl.style.setProperty('--cell-h', LENS_CELL + 'px');
-  // direction: rtl : la première colonne du DOM s'affiche à droite, comme dans la vraie grille
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      const col = cols[ci + dc];
-      const src = col ? col.querySelectorAll('.cell')[ri + dr] : null;
-      let c;
-      if (!src) { c = document.createElement('div'); c.className = 'cell empty-slot'; }
-      else { c = src.cloneNode(true); c.classList.remove('drag-over'); }
-      if (dr === 0 && dc === 0) c.classList.add('drag-over');
-      lensEl.appendChild(c);
-    }
-  }
+  const grid = document.getElementById('grid');
+  grid.classList.remove('zooming');
+  grid.style.transformOrigin = '';
+  gridZoomBox = null;
 }
 
 // ── Grille ──
@@ -331,11 +303,11 @@ function renderDeck() {
         e.preventDefault(); // empêche le scroll de la page pendant le glisser
         el.style.left = (parseFloat(el.dataset.ox) + dx) + 'px';
         el.style.top = (parseFloat(el.dataset.oy) + dy) + 'px';
+        moveGridZoom(t.clientX, t.clientY);
         document.querySelectorAll('.cell.drag-over').forEach(c => c.classList.remove('drag-over'));
         const under = document.elementFromPoint(t.clientX, t.clientY);
         const cellUnder = under && under.closest('.cell');
         if (cellUnder) cellUnder.classList.add('drag-over');
-        updateLens(t.clientX, t.clientY, cellUnder);
       }
     }, { passive: false });
 

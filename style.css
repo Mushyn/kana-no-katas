@@ -143,14 +143,9 @@ body {
 .cell.empty-slot { background: transparent; border: none; }
 .cell.drag-over  { border-color: var(--purple); background: var(--purple-light); z-index: 20; }
 
-/* Loupe (3 x 3 cases) pendant le glisser d'une carte : voir updateLens dans game.js */
-#lens {
-  position: fixed; z-index: 2000; pointer-events: none; display: none;
-  grid-template-columns: repeat(3, auto); gap: 4px; direction: rtl; padding: 8px;
-  background: var(--bg); border: 2px solid var(--purple); border-radius: 18px;
-  box-shadow: 0 10px 28px rgba(0,0,0,.28);
-}
-#lens .cell { transition: none; }
+/* Zoom de toute la grille pendant le glisser (voir startGridZoom dans game.js) */
+#grid.zooming { transform: scale(var(--zoom, 2)); transition: transform 0.12s ease-out; will-change: transform; }
+#grid.zooming .cell { transition: none; }
 .cell.correct    { border: 2px solid var(--green); background: var(--green-light); cursor: default; }
 .cell.wrong      { border: 2px solid var(--red); background: var(--red-light); animation: shake 0.3s; }
 .cell.highlight  { border: 2px solid var(--amber-mid); background: var(--amber-light); animation: pulse 0.5s 4; }
