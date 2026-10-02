@@ -1,5 +1,8 @@
 // ── État global ──
-let mode = 'both';
+// Alphabet : réglage commun (shared.js), 'both' | 'hiragana' | 'katakana' ici
+const MODE_OF = { both: 'both', h: 'hiragana', k: 'katakana' };
+const SCRIPT_OF = { both: 'both', hiragana: 'h', katakana: 'k' };
+let mode = MODE_OF[KanaStore.script()];
 // Colonnes connues : réglage commun à tous les jeux (voir shared.js). Identifiant d'une colonne : KanaStore.colKey(col).
 let selectedCols = KanaStore.columns();
 const isDiacriticKey = key => COLS.some(c => c.diacritic && KanaStore.colKey(c) === key);
@@ -154,6 +157,10 @@ function buildGrid() {
 
   const cellSize = calcCellSize();
   document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
+  // Trait et arrondi proportionnels à la case : un trait pointillé de 2 px sur une case de 17 px écrase le dessin (comme dans le puzzle : 1,5 px et 5 px)
+  const rb = document.documentElement.style;
+  rb.setProperty('--cell-bw', (cellSize < 26 ? 1 : cellSize < 40 ? 1.5 : 2) + 'px');
+  rb.setProperty('--cell-r', Math.max(3, Math.min(10, Math.round(cellSize * 0.2))) + 'px');
 
   COLS.forEach(col => {
     if (col.label === 'SEP' || col.label === 'SEP2') {
@@ -496,6 +503,7 @@ function showBilan() {
 // ── Contrôles ──
 function setMode(m, btn) {
   mode = m;
+  KanaStore.setScript(SCRIPT_OF[m]);
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   resetGame();
@@ -526,6 +534,8 @@ function resetGame() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Bouton d'alphabet actif, d'après le réglage commun
+  document.querySelectorAll('#mode-toggle .mode-btn').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes("'" + mode + "'")));
   // État du bouton « Diacritiques » et du libellé des colonnes, d'après le réglage commun
   const dbtn = document.getElementById('diac-switch');
   dbtn.classList.toggle('active', showDiacritics);

@@ -111,3 +111,20 @@ test('un stockage illisible ne fait pas planter le module', () => {
   assert.strictEqual(s.summary().tableau.ok, 0);
   s.resetProgress();
 });
+
+test('alphabet commun : ひ+カ par défaut, mémorisé, valeurs inconnues refusées', () => {
+  const st = fakeStorage(), s = createStore(st);
+  assert.strictEqual(s.script(), 'both');
+  assert.strictEqual(s.singleScript(), 'h');          // tracé et puzzle : « les deux » devient hiragana
+  s.setScript('k');
+  assert.strictEqual(createStore(st).script(), 'k');  // relu par une autre page
+  assert.strictEqual(s.singleScript(), 'k');
+  s.setScript('zzz');
+  assert.strictEqual(s.script(), 'k');
+});
+
+test('la remise à zéro garde l\'alphabet choisi', () => {
+  const s = createStore(fakeStorage());
+  s.setScript('k'); s.resetProgress();
+  assert.strictEqual(s.script(), 'k');
+});

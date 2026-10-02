@@ -15,6 +15,7 @@
   const PROGRESS_KEY = 'kana-progress';
   const PUZZLE_BEST_KEY = 'kana-puzzle-best';
   const LECTURE_PREFS_KEY = 'kana-lecture-prefs';
+  const SCRIPT_KEY = 'kana-script';
 
   // Colonnes proposées au départ : tout le hiragana de base (sans dakuten ni handakuten)
   const DEFAULT_COLUMNS = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa', 'n'];
@@ -62,6 +63,15 @@
       setColumnsFromIndexes(allCols, indexes) {
         this.setColumns(indexes.filter(i => allCols[i]).map(i => colKey(allCols[i])));
       },
+
+      // ── Alphabet : 'both' (hiragana + katakana), 'h' ou 'k' ──
+      // Le tableau utilise les trois valeurs. Le tracé et le puzzle jouent un seul alphabet à la fois : 'both' y devient hiragana.
+      script() {
+        const s = readJSON(storage, SCRIPT_KEY, null);
+        return s === 'h' || s === 'k' || s === 'both' ? s : 'both';
+      },
+      setScript(s) { if (s === 'h' || s === 'k' || s === 'both') writeJSON(storage, SCRIPT_KEY, s); },
+      singleScript() { return this.script() === 'k' ? 'k' : 'h'; },
 
       // ── Enregistrement de la progression ──
       // script : 'h' (hiragana) ou 'k' (katakana) ; romaji : 'ka', 'si'...
@@ -128,7 +138,7 @@
         };
       },
 
-      // Remise à zéro de la progression (les colonnes choisies sont conservées)
+      // Remise à zéro de la progression (les colonnes et l'alphabet choisis sont conservés)
       resetProgress() {
         try { storage.removeItem(PROGRESS_KEY); storage.removeItem(PUZZLE_BEST_KEY); } catch (e) { /* ignoré */ }
         const lp = readJSON(storage, LECTURE_PREFS_KEY, null);

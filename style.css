@@ -133,8 +133,8 @@ body {
 
 .cell {
   width: var(--cell-size, 56px); height: var(--cell-h, var(--cell-size, 56px));
-  flex-shrink: 0; border-radius: 10px;
-  border: 2px dashed var(--border);
+  flex-shrink: 0; border-radius: var(--cell-r, 10px);
+  border: var(--cell-bw, 2px) dashed var(--border);
   display: flex; align-items: center; justify-content: center; flex-direction: column;
   font-size: calc(var(--cell-size, 56px) * 0.55); background: var(--bg); cursor: pointer;
   color: var(--kana-color);
@@ -146,9 +146,9 @@ body {
 /* Zoom de toute la grille pendant le glisser (voir startGridZoom dans game.js) */
 #grid.zooming { transform: scale(var(--zoom, 2)); transition: transform 0.12s ease-out; will-change: transform; }
 #grid.zooming .cell { transition: none; }
-.cell.correct    { border: 2px solid var(--green); background: var(--green-light); cursor: default; }
-.cell.wrong      { border: 2px solid var(--red); background: var(--red-light); animation: shake 0.3s; }
-.cell.highlight  { border: 2px solid var(--amber-mid); background: var(--amber-light); animation: pulse 0.5s 4; }
+.cell.correct    { border: var(--cell-bw, 2px) solid var(--green); background: var(--green-light); cursor: default; }
+.cell.wrong      { border: var(--cell-bw, 2px) solid var(--red); background: var(--red-light); animation: shake 0.3s; }
+.cell.highlight  { border: var(--cell-bw, 2px) solid var(--amber-mid); background: var(--amber-light); animation: pulse 0.5s 4; }
 
 .cell .chars { display: flex; gap: 1px; font-size: calc(var(--cell-size, 56px) * 0.45); flex-wrap: wrap; justify-content: center; }
 .cell .chars .ch-hira { color: var(--purple); order: 1; }

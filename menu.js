@@ -12,7 +12,8 @@
     const b = document.createElement('button');
     b.className = 'mn-chip' + (picked.has(key) ? ' on' : '');
     b.setAttribute('aria-pressed', picked.has(key) ? 'true' : 'false');
-    b.innerHTML = H[key] + '<small>' + key + '</small>';
+    const sc = KanaStore.script();
+    b.innerHTML = (sc === 'k' ? K[key] : sc === 'both' ? H[key] + K[key] : H[key]) + '<small>' + key + '</small>';
     b.onclick = () => { if (picked.has(key)) picked.delete(key); else picked.add(key); save(); };
     return b;
   }
@@ -35,5 +36,18 @@
   $('mn-base').onclick = () => { picked = new Set(BASE.map(KanaStore.colKey)); save(); };
   $('mn-none').onclick = () => { picked = new Set(); save(); };
 
+  // Alphabet commun : trois boutons, mémorisés par shared.js
+  function renderScript() {
+    const cur = KanaStore.script();
+    document.querySelectorAll('#mn-script button').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === cur);
+      b.setAttribute('aria-pressed', b.dataset.s === cur ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('#mn-script button').forEach(b => {
+    b.onclick = () => { KanaStore.setScript(b.dataset.s); renderScript(); render(); };
+  });
+
+  renderScript();
   render();
 })();

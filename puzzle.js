@@ -45,6 +45,7 @@
       // Préférences mémorisées (alphabet, niveau, colonnes de départ du niveau Facile, œil)
       this.prefs = loadJSON(PREFS_KEY, { script: 'h', level: 'mid', picked: [0], hints: true });
       this.best = loadJSON(BEST_KEY, {});
+      this.prefs.script = KanaStore.singleScript();               // alphabet : réglage commun (shared.js)
       this.prefs.picked = KanaStore.columnsAsIndexes(ALL_COLS);   // colonnes connues : réglage commun à tous les jeux (shared.js)
 
       this.curCols = [];         // Facile : colonnes jouées dans la partie en cours (elles s'allongent au fil des grilles sans faute)
@@ -121,7 +122,7 @@
 
     initSelect() {
       document.querySelectorAll('#pz-script button').forEach(b => {
-        b.onclick = () => { this.prefs.script = b.dataset.s; this.save(); this.refreshSelect(); };
+        b.onclick = () => { this.prefs.script = b.dataset.s; KanaStore.setScript(b.dataset.s); this.save(); this.refreshSelect(); };
       });
       $('#pz-start').onclick = () => { this.curCols = [...this.prefs.picked]; this.startGame(); };
       this.refreshSelect();

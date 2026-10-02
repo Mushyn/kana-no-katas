@@ -385,7 +385,7 @@
 <script>
 let REF_STROKES = null;
 
-let currentMode = 'hiragana';
+let currentMode = KanaStore.singleScript() === 'k' ? 'katakana' : 'hiragana';   // alphabet : réglage commun (shared.js)
 let tSelectedCols = KanaStore.columns();   // colonnes connues : réglage commun à tous les jeux (shared.js)
 let tFullDeck = [], tCurrentCard = null;
 let tScore = { ok: 0, err: 0 };
@@ -851,6 +851,7 @@ function setSessionLength(n, btn) {
 
 function setTraceMode(m, btn) {
   currentMode = m;
+  KanaStore.setScript(m === 'katakana' ? 'k' : 'h');
   document.querySelectorAll('#trace-mode-toggle .mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   buildTColSelector();
@@ -916,6 +917,7 @@ function onViewBtn(btn) {
 }
 
 function init() {
+  document.querySelectorAll('#trace-mode-toggle .mode-btn').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes("'" + currentMode + "'")));
   document.getElementById('view-btn').classList.toggle('active', getViewLevel() > 0);
   updateTColLabel();
   buildTColSelector();
