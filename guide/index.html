@@ -106,6 +106,16 @@
   .lever-num { flex-shrink: 0; width: 25px; height: 25px; border-radius: 50%; background: var(--g-purple); color: white; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
   .lever-card p { margin: 0; font-size: 15px; }
 
+  /* Étapes d'installation : une ligne par geste, avec l'icône à toucher (comme dans le panneau du menu) */
+  .isteps { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  #ch08 .lever-card { padding: 18px 12px; }
+  #ch08 .lever-card > .lever-title, #ch08 .lever-card > p { padding: 0 6px; }
+  .istep { display: flex; align-items: center; gap: 10px; background: var(--g-bg); border: 1px solid var(--g-border); border-radius: 14px; padding: 11px 12px; }
+  .istep-n { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; background: var(--g-purple); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .istep-ico { width: 36px; height: 36px; border-radius: 12px; flex-shrink: 0; background: var(--g-purple-light); color: var(--g-purple-dark); display: flex; align-items: center; justify-content: center; }
+  .istep-t { font-size: 15px; line-height: 1.4; min-width: 0; }
+  .istep-t b { display: block; }
+  .istep-t span { display: block; margin-top: 2px; font-size: 13.5px; color: var(--g-text2); }
   .tip-card { margin: 18px 0; padding: 15px 17px; background: var(--g-green-light); border-radius: 14px; display: flex; gap: 11px; align-items: flex-start; font-size: 14px; color: var(--g-tip-text); }
   .tip-card .tip-icon { font-size: 17px; flex-shrink: 0; }
 
@@ -410,12 +420,24 @@
 
       <div class="lever-card">
         <div class="lever-title"><span class="lever-num">2</span>Sur Android</div>
-        <p>Ouvre l'application dans Chrome (ou Edge, ou Samsung Internet). Touche « Installer » dans le panneau du menu, puis confirme dans la fenêtre que le navigateur affiche. Sans le panneau, ouvre le menu du navigateur (les trois points) et choisis « Installer l'application » ou « Ajouter à l'écran d'accueil » : le libellé dépend du navigateur et de sa version. L'icône « かな の 型 » apparaît alors sur l'écran d'accueil, et c'est par elle qu'il faut ouvrir l'application ensuite.</p>
+        <ol class="isteps">
+        <li class="istep"><span class="istep-n">1</span><div class="istep-t"><b>Ouvre l'application dans Chrome</b><span>Ou Edge, ou Samsung Internet.</span></div></li>
+        <li class="istep"><span class="istep-n">2</span><span class="istep-ico"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></span><div class="istep-t"><b>Touche « Installer »</b><span>Dans le panneau du menu. Sans le panneau, ouvre le menu du navigateur (les trois points) et choisis « Installer l'application » ou « Ajouter à l'écran d'accueil » : le libellé dépend du navigateur et de sa version.</span></div></li>
+        <li class="istep"><span class="istep-n">3</span><div class="istep-t"><b>Confirme</b><span>Dans la fenêtre que le navigateur affiche.</span></div></li>
+        <li class="istep"><span class="istep-n">4</span><div class="istep-t"><b>Ouvre l'application par son icône</b><span>L'icône « かな の 型 » apparaît sur l'écran d'accueil, et c'est par elle qu'il faut ouvrir l'application ensuite.</span></div></li>
+        </ol>
       </div>
 
       <div class="lever-card">
         <div class="lever-title"><span class="lever-num">3</span>Sur iPhone et iPad</div>
-        <p>Sur iOS, une page web ne peut pas lancer l'installation elle-même : il faut passer par le navigateur. Ouvre l'application dans Safari, puis : 1. touche le bouton « trois points » dans la barre du navigateur, en bas de l'écran (selon la version d'iOS, le bouton Partager peut déjà être visible dans la barre : dans ce cas, passe directement à l'étape 2) ; 2. touche Partager (le carré avec une flèche vers le haut) ; 3. dans la rangée d'actions du bas (Copier, Ajouter à Signets, Ajouter à la liste de lecture…), touche « En voir plus » (la flèche en forme de chevron vers le bas) pour afficher les autres actions ; 4. choisis « Sur l'écran d'accueil » (fais défiler la liste si besoin) ; 5. touche « Ajouter », en haut à droite. L'icône apparaît sur l'écran d'accueil. Le panneau du menu affiche ces mêmes étapes.</p>
+        <p>Sur iOS, une page web ne peut pas lancer l'installation elle-même : il faut passer par le navigateur. Ouvre l'application dans Safari, puis suis ces cinq étapes (le panneau du menu affiche les mêmes).</p>
+        <ol class="isteps">
+        <li class="istep"><span class="istep-n">1</span><span class="istep-ico"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></span><div class="istep-t"><b>Touche les trois points</b><span>Dans la barre de Safari, en bas de l'écran. Si tu vois déjà le bouton Partager dans la barre, passe à l'étape 2.</span></div></li>
+        <li class="istep"><span class="istep-n">2</span><span class="istep-ico"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span><div class="istep-t"><b>Touche Partager</b><span>Le carré avec une flèche vers le haut.</span></div></li>
+        <li class="istep"><span class="istep-n">3</span><span class="istep-ico"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span><div class="istep-t"><b>Touche « En voir plus »</b><span>Dans la rangée d'actions du bas (Copier, Ajouter à Signets, Ajouter à la liste de lecture…) : la flèche en forme de chevron vers le bas, pour afficher les autres actions.</span></div></li>
+        <li class="istep"><span class="istep-n">4</span><span class="istep-ico"><svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span><div class="istep-t"><b>Choisis « Sur l'écran d'accueil »</b><span>Fais défiler la liste si besoin.</span></div></li>
+        <li class="istep"><span class="istep-n">5</span><div class="istep-t"><b>Touche « Ajouter »</b><span>En haut à droite. L'icône apparaît sur l'écran d'accueil.</span></div></li>
+        </ol>
       </div>
 
       <div class="lever-card">
