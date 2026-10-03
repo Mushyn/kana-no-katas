@@ -29,7 +29,8 @@ class PuzzleGame {
     for (const id of this.positions.keys()) this.placement.set(id, null);
 
     this.locked = new Set();      // cartes bien placées : elles ne bougent plus
-    this.round = 0;               // nombre de vérifications effectuées
+    this.round = 0;               // nombre de vérifications effectuées (niveaux avec vérification de la grille)
+    this.errors = 0;              // cartes mal posées (niveau Moyen : évaluation carte par carte)
   }
 
   get total() { return this.positions.size; }
@@ -93,14 +94,42 @@ class PuzzleGame {
   statusOf(cardId) {
     const slot = this.placement.get(cardId);
     if (slot === null) return null;
-    if (slot === cardId) return 'green';
+    return this.compare(cardId, slot);
+  }
+
+  // Compare une carte avec une case, qu'elle y soit posée ou non (mêmes statuts que statusOf).
+  // Fonction « pure » : elle ne modifie rien, elle répond seulement.
+  compare(cardId, slotKey) {
+    if (slotKey === cardId) return 'green';
     const voulu = this.positions.get(cardId);
-    const actuel = this.positions.get(slot);
+    const actuel = this.positions.get(slotKey);
     const memeColonne = voulu.col === actuel.col;
     const memeLigne = voulu.row === actuel.row;
     if (memeColonne) return 'yellow';
     if (memeLigne) return 'orange';
     return 'red';
+  }
+
+  // ── Évaluation immédiate (niveau Moyen) ──
+  // Le joueur dépose une carte du tas sur une case : on juge tout de suite.
+  //   - bonne case : la carte est posée et verrouillée ;
+  //   - sinon : la carte N'EST PAS posée (elle reste dans le tas), l'erreur est comptée.
+  // Renvoie { ok, status, finished } ; status = 'green' | 'yellow' | 'orange' | 'red'.
+  drop(cardId, slotKey) {
+    if (!this.placement.has(cardId)) throw new Error('Carte inconnue : ' + cardId);
+    if (!this.positions.has(slotKey)) throw new Error('Case inconnue : ' + slotKey);
+    if (this.locked.has(cardId)) return { ok: false, reason: 'carte verrouillée' };
+    const occupant = this.cardIn(slotKey);
+    if (occupant && occupant !== cardId) return { ok: false, reason: 'case occupée' };
+
+    const status = this.compare(cardId, slotKey);
+    if (status === 'green') {
+      this.placement.set(cardId, slotKey);
+      this.locked.add(cardId);
+    } else {
+      this.errors++;
+    }
+    return { ok: true, status, finished: this.isFinished() };
   }
 
   // À appeler quand la grille est pleine. Verrouille les cartes vertes et

@@ -15,10 +15,63 @@
   const BLINK_MS = 10000;           // durée du clignotement après une vérification
   const PREFS_KEY = 'kana-puzzle-prefs';
   const BEST_KEY = 'kana-puzzle-best';
+  const FEEDBACK_MS = 800;          // durée du clignotement d'une carte mal posée (niveau Moyen)
+  const FLASH_OK_MS = 700;          // durée du clignotement vert d'une carte bien posée
+
+  // ── Sons (niveau Moyen) ──
+  // Pas de fichiers : les sons sont fabriqués par le navigateur (Web Audio) avec quelques notes.
+  // Le contexte audio ne peut démarrer qu'après un geste de l'utilisateur : on le crée au premier toucher.
+  let audioCtx = null;
+  function initAudio() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { audioCtx = null; }
+  }
+  // notes : liste de [fréquence en Hz, durée en s] jouées l'une après l'autre
+  function playNotes(notes, type, volume) {
+    if (!audioCtx) return;
+    let t = audioCtx.currentTime + 0.01;
+    notes.forEach(([freq, dur]) => {
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(volume, t + 0.012);        // attaque courte
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);          // extinction progressive
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+      t += dur * 0.8;
+    });
+  }
+  const SOUNDS = {
+    win:  () => playNotes([[1046.5, 0.14], [1318.5, 0.14], [1568, 0.32]], 'sine', 0.30),     // « ting ! » : do-mi-sol aigus
+    fail: () => playNotes([[196, 0.22], [147, 0.38]], 'sawtooth', 0.16),                      // « échec » : deux notes graves qui descendent
+    near: () => playNotes([[659, 0.16], [523, 0.26]], 'triangle', 0.30)                       // « presque » : deux notes moyennes
+  };
+
+  // ── Voix (la même que dans le jeu Lecture : synthèse vocale de l'appareil) ──
+  const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  // Dit un kana puis appelle done() une seule fois (à la fin de la voix, ou après un délai de sécurité)
+  function speakThen(text, done) {
+    let called = false;
+    const end = () => { if (!called) { called = true; done(); } };
+    if (!canSpeak) { setTimeout(end, 800); return; }
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ja-JP'; u.rate = 0.9;
+      const vs = speechSynthesis.getVoices();
+      const v = vs.find(x => x.lang === 'ja-JP') || vs.find(x => x.lang && x.lang.toLowerCase().startsWith('ja'));
+      if (v) u.voice = v;
+      u.onend = end; u.onerror = end;
+      speechSynthesis.speak(u);
+    } catch (e) { setTimeout(end, 800); return; }
+    setTimeout(end, 2500);   // filet de sécurité : certaines voix n'envoient jamais « fin »
+  }
 
   const LEVELS = {
     easy: { name: 'Facile',    desc: 'Tu choisis les colonnes de départ ; une de plus à chaque grille sans faute' },
-    mid:  { name: 'Moyen',     desc: 'Toutes les colonnes de base : 46 cartes' },
+    mid:  { name: 'Moyen',     desc: 'Toutes les colonnes de base : 46 cartes, jugées une par une' },
     hard: { name: 'Difficile', desc: 'Avec dakuten et handakuten : 71 cartes' }
   };
 
@@ -132,6 +185,27 @@
       document.querySelectorAll('#pz-script button').forEach(b => b.classList.toggle('active', b.dataset.s === this.prefs.script));
       this.buildLevels();
       this.buildPicker();
+      this.buildLegend();
+    }
+
+    // La légende dépend du niveau : au Moyen chaque carte est jugée dès qu'on la dépose
+    buildLegend() {
+      const mid = this.prefs.level === 'mid';
+      const text = mid ? {
+        green: 'Bien placée : elle reste en place (un « ting ! » et un flash vert)',
+        yellow: '« Pas la bonne ligne ! » : bonne colonne, tu entends le kana, la carte repart dans le tas',
+        orange: '« Pas la bonne colonne ! » : bonne ligne, tu entends le kana, la carte repart dans le tas',
+        red: 'Ni l\'une ni l\'autre : son d\'échec, la carte repart dans le tas',
+        foot: 'Chaque carte est jugée dès que tu la poses. Plus tu vas vite, plus tu marques de points. Le son de l\'appareil doit être activé.'
+      } : {
+        green: 'Bien placée : elle reste en place',
+        yellow: 'Bonne colonne, mauvaise ligne : monte ou descends',
+        orange: 'Bonne ligne, mauvaise colonne : va à gauche ou à droite',
+        red: 'Ni la bonne colonne, ni la bonne ligne',
+        foot: 'Les cartes mal placées clignotent 10 s puis retournent dans le tas. Plus tu vas vite, plus tu marques de points.'
+      };
+      $('#pz-leg-h').textContent = mid ? 'À chaque carte posée' : 'Après chaque grille complète';
+      document.querySelectorAll('.pz-legend [data-k]').forEach(n => { n.textContent = text[n.dataset.k]; });
     }
 
     buildLevels() {
@@ -238,6 +312,9 @@
       this.columns = this.columnsForGame();
       this.game = new PuzzleGame(this.columns);
       this.clock = new ScoreClock(this.game.total);
+      this.instant = this.prefs.level === 'mid';       // Moyen : chaque carte est jugée dès qu'on la dépose
+      this.busy = new Set();                          // cartes en train d'être renvoyées (on ne peut pas les saisir)
+      this.clearFeedback();
       this.phase = 'idle';
       $('#pz-win').style.display = 'none';
       $('#pz-skip').style.display = 'none';
@@ -265,6 +342,20 @@
     stopTimers() {
       clearTimeout(this.blinkTimer); this.blinkTimer = null; this.skipBlink = null;
       clearInterval(this.scoreTimer); this.scoreTimer = null;
+      this.clearFeedback();
+    }
+
+    // Annule les clignotements et retours en cours (niveau Moyen) et coupe la voix
+    clearFeedback() {
+      if (this.fbTimers) this.fbTimers.forEach(t => clearTimeout(t));
+      this.fbTimers = new Set();
+      if (canSpeak) { try { speechSynthesis.cancel(); } catch (e) { /* ignoré */ } }
+      const toast = $('#pz-toast'); if (toast) toast.className = '';
+    }
+
+    later(fn, ms) {
+      const t = setTimeout(() => { this.fbTimers.delete(t); fn(); }, ms);
+      this.fbTimers.add(t);
     }
 
     buildGrid() {
@@ -381,9 +472,10 @@
       if (this.phase !== 'play') return;
       const node = e.target.closest('.pz-card'); if (!node) return;
       const id = node.dataset.id;
-      if (this.game.locked.has(id)) return;
+      if (this.game.locked.has(id) || (this.busy && this.busy.has(id))) return;
       e.preventDefault();
       node.setPointerCapture(e.pointerId);
+      initAudio();                                     // premier geste : on peut démarrer le son
       this.clock.start();                              // le chrono démarre au premier toucher
       this.drag = { id, from: this.game.slotOf(id) };
       node.classList.add('dragging');
@@ -406,6 +498,11 @@
       for (const slot of this.slotEls.values()) slot.classList.remove('over');
 
       const target = this.slotAt(e.clientX, e.clientY - LIFT);
+      if (target && this.instant) {
+        this.dropInstant(id, target);                  // Moyen : jugement immédiat
+        this.updateHud();
+        return;
+      }
       if (target) {
         const res = this.game.move(id, target);        // le modèle décide (pose, échange, refus)
         this.render(id);
@@ -454,7 +551,7 @@
       const pr = this.relRect(this.pilezone);
       const spanX = Math.max(1, pr.width - PILE_W - 8), spanY = Math.max(1, pr.height - PILE_H - 26);
       for (const [id, p] of this.pile) {
-        if (this.game.slotOf(id) || this.game.locked.has(id)) continue;      // seulement les cartes du tas
+        if (this.game.slotOf(id) || this.game.locked.has(id) || this.busy.has(id)) continue;      // seulement les cartes du tas
         const cl = pr.left + 4 + p.fx * spanX, ct = pr.top + 4 + p.fy * spanY;
         if (Math.hypot(cl + PILE_W / 2 - px, ct + PILE_H / 2 - py) > 70) continue;   // hors du doigt
         p.fx = clamp01(p.fx + (dx * 0.9) / spanX);
@@ -463,6 +560,58 @@
         this.render(id);
       }
       this.shake = { x: e.clientX, y: e.clientY };
+    }
+
+    // ═════════ Niveau Moyen : jugement immédiat d'une carte ═════════
+
+    dropInstant(id, slotKey) {
+      const res = this.game.drop(id, slotKey);          // le modèle juge : bonne case, colonne ou ligne juste, ou rien
+      const card = this.cards.get(id);
+      if (!res.ok) { this.sendToPile(id, false); return; }
+
+      if (res.status === 'green') {
+        this.render(id);                                // la carte se pose dans sa case
+        card.classList.add('locked', 'flash-ok');
+        this.later(() => card.classList.remove('flash-ok'), FLASH_OK_MS);   // clignote en vert puis reprend sa couleur
+        SOUNDS.win();
+        if (res.finished) {
+          this.phase = 'done';
+          this.clock.stop();                            // le chrono s'arrête à la dernière carte, pas après le clignotement
+          this.later(() => this.finish({ instant: true }), FLASH_OK_MS);
+        }
+        return;
+      }
+
+      // Carte mal posée : elle apparaît un instant dans la case visée, clignote, puis repart dans le tas
+      const r = this.relRect(this.slotEls.get(slotKey));
+      card.classList.add('in-slot', 'bad', 'k-' + res.status);
+      card.style.zIndex = 1200;
+      this.setBox(id, r.left, r.top, r.width, r.height, 0);
+      this.busy.add(id);
+      const giveBack = () => {
+        card.classList.remove('bad', 'k-' + res.status);
+        this.busy.delete(id);
+        this.sendToPile(id, true);
+      };
+      if (res.status === 'red') {                       // ni la bonne colonne, ni la bonne ligne : échec
+        SOUNDS.fail();
+        this.later(giveBack, FEEDBACK_MS);
+      } else {                                          // une des deux est juste : message + son du kana
+        SOUNDS.near();
+        this.showToast(res.status === 'yellow' ? 'Pas la bonne ligne !' : 'Pas la bonne colonne !');
+        const chars = this.prefs.script === 'h' ? H : K;
+        this.later(() => speakThen(chars[id], () => this.later(giveBack, 150)), 350);   // le son du kana, puis retour au tas
+      }
+    }
+
+    // Message qui clignote brièvement au-dessus de la grille
+    showToast(text) {
+      const t = $('#pz-toast');
+      t.textContent = text;
+      t.className = '';
+      void t.offsetWidth;                               // relance l'animation si un message était déjà affiché
+      t.className = 'show';
+      this.later(() => { t.className = ''; }, 1600);
     }
 
     // ═════════ Vérification, clignotement, retour des cartes ═════════
@@ -537,8 +686,11 @@
       const mmss = Math.floor(secs / 60) + ' min ' + String(secs % 60).padStart(2, '0') + ' s';
       $('#pz-win-score').innerHTML = score + ' <small>/ ' + this.clock.capital + ' pts</small>';
       $('#pz-win-rec').textContent = record ? (previous == null ? 'Premier score enregistré !' : 'Nouveau record !') : 'Record : ' + previous + ' pts';
-      $('#pz-win-det').textContent = mmss + ' · ' + result.round + (result.round > 1 ? ' manches' : ' manche');
-      this.offerNextColumn(result.round === 1);
+      const errs = this.game.errors;
+      $('#pz-win-det').textContent = result.instant
+        ? mmss + ' · ' + (errs ? errs + (errs > 1 ? ' erreurs' : ' erreur') : 'sans erreur')
+        : mmss + ' · ' + result.round + (result.round > 1 ? ' manches' : ' manche');
+      this.offerNextColumn(!result.instant && result.round === 1);
       $('#pz-win').style.display = 'block';
     }
 
@@ -581,6 +733,11 @@
       const g = this.game;
       const placed = g.total - g.pileCards().length;
       const manche = this.phase === 'check' || this.phase === 'done' ? g.round : g.round + 1;
+      if (this.instant) {
+        $('#pz-status').textContent = g.locked.size + '/' + g.total + ' justes · ' + g.errors + (g.errors > 1 ? ' erreurs' : ' erreur');
+        this.updateScore();
+        return;
+      }
       $('#pz-status').textContent = this.phase === 'check' || this.phase === 'done'
         ? 'Manche ' + manche + ' · ' + g.locked.size + '/' + g.total + ' justes'
         : 'Manche ' + manche + ' · ' + placed + '/' + g.total + ' posées';

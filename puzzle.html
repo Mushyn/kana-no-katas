@@ -45,12 +45,12 @@
       </div>
       <button class="pz-play" id="pz-start">Jouer</button>
       <div class="pz-legend">
-        <h3>Après chaque grille complète</h3>
-        <div class="row"><span class="pz-sw green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg></span> Bien placée : elle reste en place</div>
-        <div class="row"><span class="pz-sw yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/></svg></span> Bonne colonne, mauvaise ligne : monte ou descends</div>
-        <div class="row"><span class="pz-sw orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></span> Bonne ligne, mauvaise colonne : va à gauche ou à droite</div>
-        <div class="row"><span class="pz-sw red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Ni la bonne colonne, ni la bonne ligne</div>
-        <div class="row" style="padding-top:4px">Les cartes mal placées clignotent 10 s puis retournent dans le tas. Plus tu vas vite, plus tu marques de points.</div>
+        <h3 id="pz-leg-h">Après chaque grille complète</h3>
+        <div class="row"><span class="pz-sw green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg></span> <span data-k="green">Bien placée : elle reste en place</span></div>
+        <div class="row"><span class="pz-sw yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/></svg></span> <span data-k="yellow">Bonne colonne, mauvaise ligne : monte ou descends</span></div>
+        <div class="row"><span class="pz-sw orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></span> <span data-k="orange">Bonne ligne, mauvaise colonne : va à gauche ou à droite</span></div>
+        <div class="row"><span class="pz-sw red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span> <span data-k="red">Ni la bonne colonne, ni la bonne ligne</span></div>
+        <div class="row" style="padding-top:4px"><span data-k="foot">Les cartes mal placées clignotent 10 s puis retournent dans le tas. Plus tu vas vite, plus tu marques de points.</span></div>
       </div>
     </div>
   </section>
@@ -74,6 +74,7 @@
       <div id="pz-gridzone"><div id="pz-grid"></div></div>
       <div id="pz-pilezone"><div id="pz-status"></div></div>
       <div id="pz-layer"></div>
+      <div id="pz-toast" role="status" aria-live="polite"></div>
       <button class="pz-ghost" id="pz-skip" style="display:none">Passer le clignotement ›</button>
       <div id="pz-win">
         <div class="t">Puzzle complet !</div>

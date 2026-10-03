@@ -103,3 +103,49 @@ test('score : la pause suspend le décompte et il ne passe jamais sous zéro', (
   t = 10 ** 9;
   assert.equal(c.score, 0);
 });
+
+// ── Niveau Moyen : évaluation carte par carte ──
+
+test('compare : donne le statut d\'une carte face à une case, sans rien déplacer', () => {
+  const g = new PuzzleGame(COLONNES);
+  assert.equal(g.compare('ki', 'ki'), 'green');
+  assert.equal(g.compare('ki', 'ka'), 'yellow');
+  assert.equal(g.compare('ki', 'i'), 'orange');
+  assert.equal(g.compare('ki', 'u'), 'red');
+  assert.equal(g.slotOf('ki'), null, 'compare ne pose pas la carte');
+});
+
+test('drop : une carte bien posée est verrouillée dans sa case', () => {
+  const g = new PuzzleGame(COLONNES);
+  const r = g.drop('ki', 'ki');
+  assert.deepEqual(r, { ok: true, status: 'green', finished: false });
+  assert.equal(g.slotOf('ki'), 'ki');
+  assert.ok(g.locked.has('ki'));
+  assert.equal(g.errors, 0);
+});
+
+test('drop : une carte mal posée reste dans le tas et compte une erreur', () => {
+  const g = new PuzzleGame(COLONNES);
+  assert.equal(g.drop('ki', 'ka').status, 'yellow');    // bonne colonne, mauvaise ligne
+  assert.equal(g.drop('ki', 'i').status, 'orange');     // bonne ligne, mauvaise colonne
+  assert.equal(g.drop('ki', 'u').status, 'red');
+  assert.equal(g.slotOf('ki'), null);
+  assert.equal(g.locked.size, 0);
+  assert.equal(g.errors, 3);
+});
+
+test('drop : refuse une case déjà occupée et une carte déjà verrouillée', () => {
+  const g = new PuzzleGame(COLONNES);
+  g.drop('ki', 'ki');
+  assert.equal(g.drop('ka', 'ki').ok, false, 'la case ki est prise');
+  assert.equal(g.drop('ki', 'ka').ok, false, 'la carte ki est verrouillée');
+  assert.equal(g.errors, 0, 'un refus n\'est pas une erreur');
+});
+
+test('drop : la partie est finie quand toutes les cartes sont justes', () => {
+  const g = new PuzzleGame(COLONNES);
+  let last;
+  for (const id of g.positions.keys()) last = g.drop(id, id);
+  assert.equal(last.finished, true);
+  assert.equal(g.isFinished(), true);
+});

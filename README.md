@@ -26,9 +26,10 @@ Fonctionne hors-ligne une fois installé comme PWA.
 ### Jeu 3 : le puzzle (`puzzle.html`)
 
 - Une grille vide en haut, une pile de cartes mélangées et tournées en bas, à placer par glisser-déposer
-- Vérification quand la grille est pleine : vert (bien placée), jaune (bonne colonne), orange (bonne ligne), rouge (ni l'une ni l'autre)
+- Niveaux Facile et Difficile : vérification quand la grille est pleine : vert (bien placée), jaune (bonne colonne), orange (bonne ligne), rouge (ni l'une ni l'autre)
 - Clignotement des cartes fausses pendant 10 s, puis retour dans la pile ; les cartes vertes restent verrouillées
 - Trois niveaux : Facile (on choisit les colonnes de départ, une colonne s'ajoute à chaque grille sans faute), Moyen (46 kanas), Difficile (71 kanas avec dakuten)
+- Niveau Moyen : chaque carte est jugée dès qu'on la dépose. Bonne case : elle reste, flash vert et « ting ». Ni la bonne colonne ni la bonne ligne : flash, son d'échec, retour dans la pile. Une seule des deux juste : message « Pas la bonne ligne ! » ou « Pas la bonne colonne ! », prononciation du kana de la carte (synthèse vocale de l'appareil), retour dans la pile. Les sons sont fabriqués par le navigateur (Web Audio), sans fichier
 - Score : 10 points par carte, moins 1 point par seconde ; meilleur score conservé par alphabet, niveau et colonnes
 - Bouton œil pour masquer les noms des colonnes et lignes
 

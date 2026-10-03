@@ -146,6 +146,25 @@
 .pz-card.off { border-color: var(--border) !important; background: var(--bg) !important; }
 .pz-card.off .badge { visibility: hidden; }
 
+/* Niveau Moyen : jugement carte par carte */
+@keyframes pz-flash-ok {
+  0%, 40%, 80% { background: color-mix(in srgb, var(--c-green) 45%, var(--bg)); border-color: var(--c-green); }
+  20%, 60%, 100% { background: var(--bg); border-color: var(--border); }
+}
+.pz-card.flash-ok { animation: pz-flash-ok .7s steps(1, end); }
+@keyframes pz-flash-bad { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+.pz-card.bad { animation: pz-flash-bad .26s ease-in-out infinite; pointer-events: none; }
+
+#pz-toast {
+  position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 1600; pointer-events: none;
+  padding: 8px 18px; border-radius: 22px; font-size: 17px; font-weight: 800; white-space: nowrap;
+  color: #fff; background: var(--c-orange); box-shadow: 0 6px 18px rgba(0,0,0,.35); opacity: 0;
+}
+#pz-toast.show { animation: pz-toast 1.6s ease-out; }
+@keyframes pz-toast {
+  0% { opacity: 0; } 8%, 30% { opacity: 1; } 18%, 42% { opacity: .35; } 54%, 80% { opacity: 1; } 100% { opacity: 0; }
+}
+
 #pz-skip { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); z-index: 1500; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
 
 #pz-win {
