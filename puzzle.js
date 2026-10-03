@@ -58,38 +58,44 @@
     if (!canSpeak || speechUnlocked) return;
     speechUnlocked = true;
     try {
-      const u = new SpeechSynthesisUtterance(' ');
+      const u = new SpeechSynthesisUtterance('あ');          // vrai texte (une phrase vide peut bloquer la file d'attente), mais sans son
       u.volume = 0; u.lang = 'ja-JP';
       speechSynthesis.speak(u);
     } catch (e) { /* ignoré */ }
   }
+  // iPhone n'accepte la voix que si elle démarre dans un « vrai » geste de fin de toucher (touchend ou clic),
+  // pas au début du toucher : on débloque donc aussi à la levée du doigt.
+  ['touchend', 'pointerup', 'click'].forEach(t => document.addEventListener(t, unlockSpeech, { capture: true, passive: true }));
+
+  // Même méthode que le jeu Lecture (qui fonctionne) : voix japonaise choisie une fois, puis cancel() et speak() à la suite.
+  let jaVoice = null;
+  function pickVoice() {
+    if (!canSpeak) return;
+    const vs = speechSynthesis.getVoices();
+    jaVoice = vs.find(x => x.lang === 'ja-JP') || vs.find(x => x.lang && x.lang.toLowerCase().startsWith('ja')) || null;
+  }
+  if (canSpeak) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+
+  let currentUtter = null;   // garder une référence : sinon le navigateur peut ramasser la phrase en pleine lecture
   // Dit un kana puis appelle done() une seule fois (à la fin de la voix, ou après un délai de sécurité)
-  let currentUtter = null;   // garder une référence : sinon le navigateur peut ramasser la phrase en pleine lecture et couper la voix
-  function speakThen(text, done) {
+  function speakThen(text, done, onProblem) {
     let called = false;
     const end = () => { if (!called) { called = true; done(); } };
     if (!canSpeak) { setTimeout(end, 800); return; }
-    const say = () => {
-      try {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ja-JP'; u.rate = 0.9;
-        const vs = speechSynthesis.getVoices();
-        const v = vs.find(x => x.lang === 'ja-JP') || vs.find(x => x.lang && x.lang.toLowerCase().startsWith('ja'));
-        if (v) u.voice = v;
-        u.onend = end; u.onerror = end;
-        currentUtter = u;
-        speechSynthesis.speak(u);
-      } catch (e) { end(); }
-    };
-    // On ne coupe que si une vraie voix est en cours. Un cancel() suivi d'un speak() dans le même instant fait perdre la nouvelle phrase
-    // (comportement connu de Chrome et Safari) : on laisse donc respirer le moteur avant de reparler.
-    if (currentUtter && (speechSynthesis.speaking || speechSynthesis.pending)) {
+    try {
       speechSynthesis.cancel();
-      currentUtter = null;
-      setTimeout(say, 120);
-    } else {
-      say();
-    }
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ja-JP'; u.rate = 0.9;
+      if (jaVoice) u.voice = jaVoice;
+      else if (speechSynthesis.getVoices().length && onProblem) onProblem('Aucune voix japonaise sur cet appareil');
+      u.onend = end;
+      u.onerror = ev => {
+        if (onProblem && ev && ev.error && ev.error !== 'canceled' && ev.error !== 'interrupted') onProblem('Voix bloquée (' + ev.error + ')');
+        end();
+      };
+      currentUtter = u;
+      speechSynthesis.speak(u);
+    } catch (e) { end(); return; }
     setTimeout(end, 2500);   // filet de sécurité : certaines voix n'envoient jamais « fin »
   }
 
@@ -640,7 +646,7 @@
         const chars = this.prefs.script === 'h' ? H : K;
         // La voix démarre tout de suite (on est encore dans le geste du doigt qui lâche la carte : c'est ce qu'exige iPhone),
         // puis la carte repart dans le tas une fois le kana prononcé.
-        if (this.prefs.voice !== false) speakThen(chars[id], () => this.later(giveBack, 150));
+        if (this.prefs.voice !== false) speakThen(chars[id], () => this.later(giveBack, 150), msg => this.showToast(msg));
         else this.later(giveBack, FEEDBACK_MS);           // voix coupée : on laisse juste le temps de lire le message
       }
     }
