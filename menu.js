@@ -27,11 +27,15 @@
     $('mn-cols-count').textContent = n + ' / ' + COLS_OK.length;
   }
 
-  $('mn-cols-toggle').onclick = () => {
+  // Un clic sur la carte (hors boutons de l'alphabet et hors contenu du panneau) déplie ou replie « Mes colonnes ».
+  // Le bouton d'en-tête reste là pour le clavier et les lecteurs d'écran : son clic remonte jusqu'à la carte.
+  $('mn-cols-toggle').closest('.mn-cols').addEventListener('click', e => {
+    // composedPath() et non closest() : un bouton qui redessine son contenu (les puces) est déjà retiré de la page quand le clic arrive ici
+    if (e.composedPath().some(n => n.id === 'mn-script' || n.id === 'mn-cols-panel')) return;
     const panel = $('mn-cols-panel'), open = panel.hidden;
     panel.hidden = !open;
     $('mn-cols-toggle').setAttribute('aria-expanded', String(open));
-  };
+  });
   $('mn-all').onclick = () => { picked = new Set(COLS_OK.map(KanaStore.colKey)); save(); };
   $('mn-base').onclick = () => { picked = new Set(BASE.map(KanaStore.colKey)); save(); };
   $('mn-none').onclick = () => { picked = new Set(); save(); };
