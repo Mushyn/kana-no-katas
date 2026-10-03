@@ -185,14 +185,6 @@
       document.querySelectorAll('[data-eye]').forEach(b => b.onclick = () => {
         this.prefs.romaji = !this.prefs.romaji; this.save(); this.applyEye();
       });
-      // Réglage manuel de la hauteur (viewport.js), comme dans le puzzle et le tracé
-      document.querySelectorAll('[data-view]').forEach(b => {
-        b.classList.toggle('active', getViewLevel() > 0);
-        b.onclick = () => {
-          const on = cycleViewLevel() > 0;
-          document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', on));
-        };
-      });
     }
 
     leave() { if (canSpeak) speechSynthesis.cancel(); this.refreshSelect(); this.show('lc-select'); }

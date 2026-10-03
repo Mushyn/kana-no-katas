@@ -72,6 +72,7 @@ body {
 #header h1 { font-size: 21px; font-weight: 600; white-space: nowrap; }
 .hd-left { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 @media (max-width: 360px) { #header { padding-left: 8px; padding-right: 8px; } #header h1 { font-size: 18px; } }
+@media (max-width: 340px) { #header h1 { font-size: 16px; } #header .hd-left { gap: 4px; } #header .hd-tools { gap: 4px; margin-left: 6px; } #header .mode-btn { padding-left: 7px; padding-right: 7px; } }
 .hd-back { font-size: 20px; line-height: 1; color: var(--text2); text-decoration: none; padding: 0 2px; }
 
 #mode-toggle { display: flex; gap: 4px; }
@@ -372,6 +373,9 @@ body {
   background: linear-gradient(145deg, var(--bg), var(--purple-light));
   box-shadow: 0 3px 10px rgba(168,85,247,0.25);
 }
+
+/* Les deux boutons du coin haut droit de chaque écran (voir header-tools.js) */
+.hd-tools { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
 
 /* Bouton « taille de l'affichage » (même famille que .help-btn, mais discret) */
 .view-btn, .eye-btn {

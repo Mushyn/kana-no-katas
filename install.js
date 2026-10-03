@@ -63,6 +63,8 @@
 
   // Pictogrammes en SVG (pas d'emoji : iOS les dessinerait à sa façon)
   const SHARE_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+  const MORE_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+  const CHEVRON_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
   const ADD_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
 
   function build(mode) {
@@ -78,7 +80,9 @@
       const steps = document.createElement('ol');
       steps.className = 'ip-steps';
       steps.innerHTML =
-        '<li>Touche <b>Partager</b> ' + SHARE_ICON + ' dans la barre du navigateur</li>' +
+        '<li>Touche le bouton <b>trois points</b> ' + MORE_ICON + ' dans la barre du navigateur <small>(si tu vois déjà Partager, passe à l\'étape 2)</small></li>' +
+        '<li>Touche <b>Partager</b> ' + SHARE_ICON + '</li>' +
+        '<li>Dans la liste d\'actions, touche <b>En voir plus</b> ' + CHEVRON_ICON + '</li>' +
         '<li>Choisis <b>Sur l\'écran d\'accueil</b> ' + ADD_ICON + '</li>' +
         '<li>Touche <b>Ajouter</b></li>';
       p.appendChild(steps);

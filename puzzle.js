@@ -273,11 +273,6 @@
       // Œil : afficher / masquer les noms de colonnes et de lignes
       $('#pz-eye').onclick = () => { this.prefs.hints = !this.prefs.hints; this.save(); this.applyHints(); };
 
-      // Réglage manuel de la hauteur (viewport.js) : filet de sécurité si l'écran se trompe de taille
-      const view = $('#pz-view');
-      view.classList.toggle('active', getViewLevel() > 0);
-      view.onclick = () => { view.classList.toggle('active', cycleViewLevel() > 0); };
-
       // Gestes : glisser une carte / remuer le tas
       this.layer.addEventListener('pointerdown', e => this.onCardDown(e));
       this.layer.addEventListener('pointermove', e => { if (this.drag) this.moveDrag(e); });
@@ -379,7 +374,13 @@
 
     sizeGrid() {
       const gz = $('#pz-gridzone').getBoundingClientRect();
-      const n = this.columns.length, labelW = 14;
+      const labelW = 14;
+      // Taille des cases : celle du niveau Moyen (colonnes de base) ou Difficile (avec dakuten et handakuten).
+      // En Facile on a moins de colonnes, mais les cases gardent la taille de l'un ou l'autre selon qu'une colonne
+      // avec dakuten ou handakuten est jouée : elles ne s'étirent pas sur toute la largeur.
+      const n = this.prefs.level === 'easy'
+        ? (this.columns.some(c => c.diacritic) ? ALL_COLS.length : BASE_COLS.length)
+        : this.columns.length;
       const cw = Math.max(14, Math.floor((gz.width - 12 - labelW - 2 * n) / n));
       const ch = Math.max(14, Math.floor((gz.height - 12 - 14 - 10) / 5));
       const g = $('#pz-grid');
