@@ -64,20 +64,32 @@
     } catch (e) { /* ignoré */ }
   }
   // Dit un kana puis appelle done() une seule fois (à la fin de la voix, ou après un délai de sécurité)
+  let currentUtter = null;   // garder une référence : sinon le navigateur peut ramasser la phrase en pleine lecture et couper la voix
   function speakThen(text, done) {
     let called = false;
     const end = () => { if (!called) { called = true; done(); } };
     if (!canSpeak) { setTimeout(end, 800); return; }
-    try {
-      if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();   // couper une voix en cours, sans rien annuler d'inutile
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ja-JP'; u.rate = 0.9;
-      const vs = speechSynthesis.getVoices();
-      const v = vs.find(x => x.lang === 'ja-JP') || vs.find(x => x.lang && x.lang.toLowerCase().startsWith('ja'));
-      if (v) u.voice = v;
-      u.onend = end; u.onerror = end;
-      speechSynthesis.speak(u);
-    } catch (e) { setTimeout(end, 800); return; }
+    const say = () => {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ja-JP'; u.rate = 0.9;
+        const vs = speechSynthesis.getVoices();
+        const v = vs.find(x => x.lang === 'ja-JP') || vs.find(x => x.lang && x.lang.toLowerCase().startsWith('ja'));
+        if (v) u.voice = v;
+        u.onend = end; u.onerror = end;
+        currentUtter = u;
+        speechSynthesis.speak(u);
+      } catch (e) { end(); }
+    };
+    // On ne coupe que si une vraie voix est en cours. Un cancel() suivi d'un speak() dans le même instant fait perdre la nouvelle phrase
+    // (comportement connu de Chrome et Safari) : on laisse donc respirer le moteur avant de reparler.
+    if (currentUtter && (speechSynthesis.speaking || speechSynthesis.pending)) {
+      speechSynthesis.cancel();
+      currentUtter = null;
+      setTimeout(say, 120);
+    } else {
+      say();
+    }
     setTimeout(end, 2500);   // filet de sécurité : certaines voix n'envoient jamais « fin »
   }
 
