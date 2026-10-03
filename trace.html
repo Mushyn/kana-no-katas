@@ -255,7 +255,7 @@
 <div id="trace-app">
 
   <div id="trace-header">
-    <a href="menu.html" aria-label="Retour au menu des jeux">←</a>
+    <a href="index.html" aria-label="Retour au menu des jeux">←</a>
     <h1>かな の 型 — Tracé</h1>
     <div id="trace-mode-toggle">
       <button class="mode-btn active" onclick="setTraceMode('hiragana',this)">ひ</button>
@@ -914,7 +914,7 @@ function init() {
 }
 window.addEventListener('resize', () => { resizeCanvas(); resizeRefSquare(); });
 
-// ── Détection de mise à jour PWA (même mécanisme que index.html) ──
+// ── Détection de mise à jour PWA (même mécanisme que tableau.html) ──
 let swRegistration = null;
 function showUpdateBanner() {
   document.getElementById('sw-update-banner').style.display = 'flex';

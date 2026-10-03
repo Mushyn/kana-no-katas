@@ -1,179 +1,135 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Kana no Katas — Apprendre les kanas japonais</title>
-  <meta name="description" content="Jeu d'apprentissage des kanas japonais par glisser-déposer avec répétition espacée." />
+  <title>Kana no Katas</title>
   <meta name="theme-color" content="#A855F7" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Kana no Katas" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="menu.css" />
   <script src="viewport.js"></script>
   <script src="header-tools.js"></script>
+  <script src="install.js"></script>
 </head>
 <body>
-<div id="app">
-  <div id="header">
-    <div class="hd-left">
-      <a class="hd-back" href="menu.html" aria-label="Retour au menu des jeux" title="Menu des jeux">←</a>
-      <h1>かな の 型</h1>
-    </div>
-    <div id="mode-toggle">
-      <button class="mode-btn active" onclick="setMode('both',this)">ひ+カ</button>
-      <button class="mode-btn" onclick="setMode('hiragana',this)">ひ</button>
-      <button class="mode-btn" onclick="setMode('katakana',this)">カ</button>
-    </div>
-    <span class="hd-tools" data-tools="ch02"></span>
+<div id="menu-app">
+
+  <div class="menu-top">
+    <h1>かな の 型</h1>
+    <span class="hd-tools" data-tools="ch06"></span>
   </div>
 
-  <div id="score-bar">
-    <span class="sp sp-ok"   id="s-ok">✓ 0</span>
-    <span class="sp sp-err"  id="s-err">✗ 0</span>
-    <span class="sp sp-left" id="s-left">◎ 0</span>
-    <span class="sp sp-retry" id="s-retry" style="display:none">↺ 0</span>
-    <button class="eye-btn" id="eye-btn" onclick="toggleGridRomaji()" aria-pressed="false" aria-label="Masquer les sons dans la grille" title="Afficher / masquer les sons (romaji) dans la grille">
-      <svg class="eye-on" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-      <svg class="eye-off" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-    </button>
-    <button id="col-selector-btn" onclick="toggleColSelector()"><span id="col-selector-label">Colonnes ▾</span></button>
-  </div>
-
-
-  <!-- Panneau de sélection (masqué par défaut) -->
-  <div id="col-selector-panel" style="display:none;">
-    <div id="col-selector-header">
-      <span>Choisir les colonnes</span>
-      <div style="display:flex;gap:6px;">
-        <button onclick="selectAllCols()">Toutes</button>
-        <button onclick="selectNoneCols()">Aucune</button>
-        <button class="btn-apply" onclick="applyColSelection()">Appliquer ✓</button>
-      </div>
+  <div class="menu-body">
+    <div class="menu-title">
+      <div class="big">Kana no Katas</div>
+      <p>Choisis un jeu</p>
     </div>
-    <div id="col-checkboxes"></div>
-  </div>
 
-  <div id="grid-zone">
-    <div id="grid-scroll">
-      <div id="grid"></div>
-    </div>
-  </div>
-
-  <div id="divider"></div>
-
-  <div id="card-zone">
-    <div id="deck-controls">
-      <label>Cartes :</label>
-      <button class="dc-btn active" onclick="setDeckSize(1,this)">1/1</button>
-      <button class="dc-btn" onclick="setDeckSize(5,this)">5/5</button>
-      <button class="dc-btn" id="btnhint" onclick="toggleHints()">Romaji</button>
-      <span id="diac-switch-group">
-        <span id="diac-switch-label">Diacritiques</span>
-        <button id="diac-switch" onclick="toggleDiacritics(this)" aria-pressed="false">
-          <span class="rt-knob"></span>
-        </button>
-        <span id="diac-switch-state">off</span>
+    <!-- Les icônes sont celles déjà utilisées dans la barre de boutons de l'écran du tableau -->
+    <a class="menu-card" href="tableau.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
       </span>
-    </div>
-    <div id="msg"></div>
-    <div id="deck-scroll"></div>
-    <div id="actions">
-      <button onclick="resetGame()" aria-label="Recommencer" title="Recommencer">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      <span class="txt"><span class="name">Le tableau</span><span class="desc">Place chaque kana dans la grille, avec répétition espacée</span></span>
+    </a>
+
+    <a class="menu-card" href="trace.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+      </span>
+      <span class="txt"><span class="name">Le tracé</span><span class="desc">Écris les kanas à la main, trait par trait</span></span>
+    </a>
+
+    <a class="menu-card" href="puzzle.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2" transform="rotate(12 17.5 17.5)"/></svg>
+      </span>
+      <span class="txt"><span class="name">Le puzzle</span><span class="desc">Reconstitue la grille des kanas, en choisissant tes colonnes</span></span>
+    </a>
+
+    <a class="menu-card" href="lecture.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      </span>
+      <span class="txt"><span class="name">La lecture</span><span class="desc">Lis des mots illustrés par une photo, sans chrono</span></span>
+    </a>
+
+    <!-- Colonnes que je connais : un seul réglage, valable pour tous les jeux -->
+    <section class="mn-cols">
+      <div class="mn-script">
+        <span class="t">Alphabet</span>
+        <div class="mn-seg" id="mn-script" role="group" aria-label="Alphabet">
+          <button data-s="both">ひ+カ</button>
+          <button data-s="h">ひ</button>
+          <button data-s="k">カ</button>
+        </div>
+      </div>
+      <p class="mn-note mn-script-note">Pour le tracé et le puzzle, ひ+カ joue en hiragana. La lecture est toujours en hiragana.</p>
+      <button class="mn-cols-head" id="mn-cols-toggle" aria-expanded="false">
+        <span class="t">Mes colonnes</span><span class="n" id="mn-cols-count"></span><span class="chev">▾</span>
       </button>
-      <button onclick="drawMore()" aria-label="Ajouter des cartes" title="Ajouter des cartes">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-    </div>
+      <div id="mn-cols-panel" hidden>
+        <p class="mn-note">Ce réglage vaut pour tous les jeux : seuls les kanas de ces colonnes sont proposés.</p>
+        <div class="mn-chips" id="mn-cols-base"></div>
+        <div class="mn-sub">Dakuten et handakuten</div>
+        <div class="mn-chips" id="mn-cols-dak"></div>
+        <div class="mn-btns">
+          <button id="mn-all">Toutes</button>
+          <button id="mn-base">Hiragana de base</button>
+          <button id="mn-none">Aucune</button>
+        </div>
+      </div>
+    </section>
+
+    <a class="menu-card slim" href="scores.html">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </span>
+      <span class="txt"><span class="name">Mes scores</span><span class="desc">Ma progression dans les quatre jeux</span></span>
+    </a>
+
+    <div class="menu-guide"><a href="guide/index.html">Guide d'apprentissage</a></div>
   </div>
 
-  <!-- Feedback erreur -->
-  <div id="feedback">
-    <div class="fb-char"   id="fb-char"></div>
-    <div class="fb-romaji" id="fb-romaji"></div>
-    <div class="fb-col"    id="fb-col"></div>
-    <div class="fb-msg">↺ Reproposé dans ~15 cartes</div>
-  </div>
-
-  <!-- Bilan -->
-  <div id="bilan">
-    <h2>Bien joué !</h2>
-    <div class="bilan-stats">
-      <div class="bstat ok"><div class="val" id="b-ok">0</div><div class="lbl">Réussis</div></div>
-      <div class="bstat err"><div class="val" id="b-err">0</div><div class="lbl">Erreurs</div></div>
-      <div class="bstat pct"><div class="val" id="b-pct">—</div><div class="lbl">Réussite</div></div>
-    </div>
-    <div class="bilan-section" id="b-errors-section">
-      <h3>À retravailler</h3>
-      <div class="bilan-grid" id="b-errors"></div>
-    </div>
-    <div class="bilan-section">
-      <h3>Maîtrisés</h3>
-      <div class="bilan-grid" id="b-ok-grid"></div>
-    </div>
-    <button onclick="resetGame()">↺ Recommencer</button>
-    <button onclick="window.location.href='scores.html'" class="bilan-trace-btn">Mes scores</button>
-    <button onclick="window.location.href='menu.html'">Menu des jeux</button>
-  </div>
+</div>
 
 <script src="data.js"></script>
 <script src="shared.js"></script>
-<script src="game.js"></script>
+<script src="menu.js"></script>
+
 <div id="sw-update-banner" style="display:none;">
   <span>✨ Nouvelle version disponible</span>
   <button onclick="applySwUpdate()">Mettre à jour</button>
 </div>
 <script>
+  // Détection de mise à jour PWA (même mécanisme que les autres pages)
   let swRegistration = null;
-
-  function showUpdateBanner() {
-    document.getElementById('sw-update-banner').style.display = 'flex';
-  }
-
+  function showUpdateBanner() { document.getElementById('sw-update-banner').style.display = 'flex'; }
   function applySwUpdate() {
     if (!swRegistration || !swRegistration.waiting) return;
     swRegistration.waiting.postMessage('SKIP_WAITING');
   }
-
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
         .then(reg => {
           swRegistration = reg;
-          console.log('SW OK', reg.scope);
-
-          // Cas 1 : un SW est déjà en attente au moment où la page se charge
-          // (l'utilisateur avait laissé un onglet ouvert pendant le déploiement).
           if (reg.waiting) showUpdateBanner();
-
-          // Cas 2 : un nouveau SW vient d'être détecté pendant cette session.
           reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            if (!newWorker) return;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateBanner();
-              }
+            const nw = reg.installing; if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner();
             });
           });
         })
         .catch(e => console.warn('SW KO', e));
-
-      // Une fois le nouveau SW activé (après le clic sur "Mettre à jour"),
-      // on recharge la page pour charger les nouveaux fichiers.
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
+        if (refreshing) return; refreshing = true; window.location.reload();
       });
-
-      // Sécurité supplémentaire : revérifie une nouvelle version toutes les heures
-      // tant que l'app reste ouverte, au cas où un cache intermédiaire (CDN, proxy)
-      // retarderait la détection automatique du navigateur.
       setInterval(() => { if (swRegistration) swRegistration.update(); }, 60 * 60 * 1000);
     });
   }
