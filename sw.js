@@ -1,10 +1,11 @@
-const CACHE_NAME = 'kana-no-katas-v70';
+const CACHE_NAME = 'kana-no-katas-v71';
 const ASSETS = [
   './',
   'index.html',
   'menu.html',
   'menu.css',
   'menu.js',
+  'install.js',
   'scores.html',
   'scores.css',
   'scores.js',

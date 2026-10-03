@@ -115,6 +115,7 @@ kana-no-katas/
 ├── puzzle.css          # Styles du puzzle
 ├── puzzle.js           # Interface du puzzle (classe PuzzleApp)
 ├── puzzle-model.js     # Règles et score du puzzle (sans DOM, testable)
+├── install.js          # Panneau « Installer l'application » du menu (détection Android / iOS, testable)
 ├── lecture.html        # Jeu 4 : la lecture
 ├── lecture.css         # Styles de la lecture
 ├── lecture.js          # Interface de la lecture (classe LectureApp)
