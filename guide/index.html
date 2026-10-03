@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>かな の 型 — Guide d'apprentissage</title>
-<meta name="theme-color" content="#A855F7">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#A855F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="../style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,31 +17,71 @@
     --g-bg: #ffffff; --g-bg2: #F7F6FB;
     --g-text: #1A1A2E; --g-text2: #6B6B85;
     --g-border: #E6E3F2;
+    --g-body: #F7F6FB;                       /* fond de la page (derrière les chapitres) */
+    --g-appbar: rgba(255,255,255,0.92);      /* barre du haut, semi-transparente */
+    --g-tip-text: #0a5c46;
+    --g-quote-a: #A855F7; --g-quote-b: #7C3AED;
+  }
+  /* Thème sombre : suit le réglage du système, comme le reste de l'application */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --g-purple: #A855F7; --g-purple-light: #3a2860; --g-purple-dark: #C77DFF;
+      --g-green: #2DFFAA; --g-green-light: #103a2a;
+      --g-bg: #1c1c1e; --g-bg2: #2c2c2e;
+      --g-text: #f2f2f7; --g-text2: #c4c4cf;
+      --g-border: #48484a;
+      --g-body: #0e0e10;
+      --g-appbar: rgba(28,28,30,0.92);
+      --g-tip-text: #7ff0c4;
+      --g-quote-a: #7C3AED; --g-quote-b: #A855F7;
+    }
+    .phone img { filter: brightness(.92); }   /* les captures d'écran sont claires : on les adoucit un peu */
   }
   * { box-sizing: border-box; }
   html, body { overflow: visible; height: auto; }
   body {
-    margin: 0; background: var(--g-bg2); color: var(--g-text);
+    margin: 0; background: var(--g-body); color: var(--g-text);
     font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7;
   }
   h1,h2,h3 { font-family: 'Outfit', sans-serif; }
   .shell { max-width: 760px; margin: 0 auto; }
 
   .appbar {
-    position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.92);
+    position: sticky; top: 0; z-index: 10; background: var(--g-appbar);
     backdrop-filter: blur(10px); border-bottom: 1px solid var(--g-border);
   }
   .appbar-inner { max-width: 760px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
   .back-link { color: var(--g-text2); text-decoration: none; font-size: 19px; flex-shrink: 0; }
   .appbar-logo { font-weight: 800; font-size: 14px; color: var(--g-purple-dark); flex-shrink: 0; }
-  .nav-pills { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-  .nav-pills::-webkit-scrollbar { display: none; }
-  .nav-pill {
-    font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 20px;
-    background: var(--g-bg2); color: var(--g-text2); text-decoration: none; white-space: nowrap;
-    transition: all .15s;
+  .nav-current { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; color: var(--g-text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
+  .burger {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; padding: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--g-bg2); color: var(--g-text); border: 1px solid var(--g-border);
   }
-  .nav-pill.active { background: var(--g-purple); color: white; }
+  .burger[aria-expanded="true"] { background: var(--g-purple); border-color: var(--g-purple); color: white; }
+  .burger .b-close { display: none; }
+  .burger[aria-expanded="true"] .b-open { display: none; }
+  .burger[aria-expanded="true"] .b-close { display: block; }
+
+  /* Menu des chapitres : déroulé sous la barre du haut */
+  .nav-menu {
+    position: absolute; left: 0; right: 0; top: 100%; z-index: 20;
+    background: var(--g-bg); border-bottom: 1px solid var(--g-border);
+    box-shadow: 0 14px 30px rgba(0,0,0,.18);
+    max-height: calc(100dvh - 64px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .nav-menu[hidden] { display: none; }
+  .nav-menu ul { list-style: none; margin: 0 auto; padding: 8px 12px 14px; max-width: 760px; }
+  .nav-menu a {
+    display: flex; align-items: center; gap: 14px; padding: 12px 12px; border-radius: 14px;
+    color: var(--g-text); text-decoration: none; font-size: 16px; font-weight: 600;
+  }
+  .nav-menu a .n { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; font-weight: 700; background: var(--g-bg2); color: var(--g-text2); }
+  .nav-menu a.active { background: var(--g-purple-light); color: var(--g-purple-dark); }
+  .nav-menu a.active .n { background: var(--g-purple); color: white; }
+  .nav-menu a:active { background: var(--g-bg2); }
 
   .hero { padding: 56px 24px 40px; text-align: center; }
   .hero-badge {
@@ -64,11 +106,11 @@
   .lever-num { flex-shrink: 0; width: 25px; height: 25px; border-radius: 50%; background: var(--g-purple); color: white; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
   .lever-card p { margin: 0; font-size: 15px; }
 
-  .tip-card { margin: 18px 0; padding: 15px 17px; background: var(--g-green-light); border-radius: 14px; display: flex; gap: 11px; align-items: flex-start; font-size: 14px; color: #0a5c46; }
+  .tip-card { margin: 18px 0; padding: 15px 17px; background: var(--g-green-light); border-radius: 14px; display: flex; gap: 11px; align-items: flex-start; font-size: 14px; color: var(--g-tip-text); }
   .tip-card .tip-icon { font-size: 17px; flex-shrink: 0; }
 
   .quote-card { margin: 24px 0 4px; padding: 20px 22px; border-radius: 16px;
-    background: linear-gradient(135deg, var(--g-purple), var(--g-purple-dark)); color: white;
+    background: linear-gradient(135deg, var(--g-quote-a), var(--g-quote-b)); color: white;
     font-weight: 600; font-size: 15.5px; line-height: 1.6; }
 
   .phone { width: 200px; margin: 22px auto; border-radius: 26px; background: #111; padding: 7px;
@@ -98,15 +140,22 @@
     <div class="appbar-inner">
       <a class="back-link" href="../menu.html" aria-label="Retour au menu des jeux" title="Retour au menu des jeux">←</a>
       <div class="appbar-logo">かな の 型</div>
-      <div class="nav-pills" id="nav-pills"><a class="nav-pill active" href="#ch01">Mémoriser</a>
-<a class="nav-pill" href="#ch02">Le tableau</a>
-<a class="nav-pill" href="#ch03">Le tracé</a>
-<a class="nav-pill" href="#ch04">Le puzzle</a>
-<a class="nav-pill" href="#ch05">La lecture</a>
-<a class="nav-pill" href="#ch06">Menu et scores</a>
-<a class="nav-pill" href="#ch07">Routine</a>
-<a class="nav-pill" href="#ch08">Installer</a></div>
+      <div class="nav-current" id="nav-current">Mémoriser</div>
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Table des matières">
+        <svg class="b-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        <svg class="b-close" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
     </div>
+    <nav class="nav-menu" id="nav-menu" hidden aria-label="Chapitres du guide"><ul>
+      <li><a href="#ch01" data-ch="ch01"><span class="n">01</span>Mémoriser</a></li>
+      <li><a href="#ch02" data-ch="ch02"><span class="n">02</span>Le tableau</a></li>
+      <li><a href="#ch03" data-ch="ch03"><span class="n">03</span>Le tracé</a></li>
+      <li><a href="#ch04" data-ch="ch04"><span class="n">04</span>Le puzzle</a></li>
+      <li><a href="#ch05" data-ch="ch05"><span class="n">05</span>La lecture</a></li>
+      <li><a href="#ch06" data-ch="ch06"><span class="n">06</span>Menu et scores</a></li>
+      <li><a href="#ch07" data-ch="ch07"><span class="n">07</span>Routine</a></li>
+      <li><a href="#ch08" data-ch="ch08"><span class="n">08</span>Installer l'application</a></li>
+    </ul></nav>
   </div>
 
   <div class="shell">
@@ -225,7 +274,7 @@
 
       <div class="lever-card">
         <div class="lever-title"><span class="lever-num">2</span>Placer les cartes</div>
-        <p>Glisse une carte de la pile vers une case de la grille, une à la fois, jusqu'à ce que la grille soit pleine. La carte se soulève au-dessus du doigt pour rester visible. Tu peux secouer la pile du bout du doigt pour mélanger les cartes et en découvrir de nouvelles. Aux niveaux Facile et Difficile, déposer une carte sur une case occupée fait échanger les deux. Au niveau Moyen, la carte n'est gardée dans la grille que si elle est bien placée : sinon elle repart dans la pile. Le bouton œil affiche ou masque les noms des colonnes et des lignes : masqués, c'est beaucoup plus difficile.</p>
+        <p>Glisse une carte de la pile vers une case de la grille, une à la fois, jusqu'à ce que la grille soit pleine. La carte se soulève au-dessus du doigt pour rester visible. Tu peux secouer la pile du bout du doigt pour mélanger les cartes et en découvrir de nouvelles. Aux niveaux Facile et Difficile, déposer une carte sur une case occupée fait échanger les deux. Au niveau Moyen, la carte n'est gardée dans la grille que si elle est bien placée : sinon elle repart dans la pile. Le bouton œil affiche ou masque les noms des colonnes et des lignes : masqués, c'est beaucoup plus difficile. Le bouton haut-parleur, à côté, active ou coupe la prononciation du kana quand la carte tombe dans la bonne colonne ou la bonne ligne mais pas dans la bonne case : coupé, tu gardes le son d'erreur et le message, sans la voix. Ton choix est mémorisé.</p>
       </div>
       <div class="phone"><img src="img/puzzle_placing.png" alt="Placement des cartes"></div>
 
@@ -386,14 +435,29 @@
   </div>
 
 <script>
-  const pills = [...document.querySelectorAll('.nav-pill')];
-  const sections = pills.map(p => document.querySelector(p.getAttribute('href')));
+  // Menu des chapitres (burger) : s'ouvre au toucher, se ferme quand on choisit un chapitre,
+  // qu'on touche ailleurs ou qu'on appuie sur Échap.
+  const burger = document.getElementById('burger');
+  const menu = document.getElementById('nav-menu');
+  const links = [...menu.querySelectorAll('a')];
+  const current = document.getElementById('nav-current');
+  function setMenu(open) {
+    menu.hidden = !open;
+    burger.setAttribute('aria-expanded', String(open));
+  }
+  burger.addEventListener('click', e => { e.stopPropagation(); setMenu(menu.hidden); });
+  links.forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target)) setMenu(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+  // Le libellé de la barre et la ligne surlignée du menu suivent le chapitre affiché
+  const sections = links.map(a => document.querySelector(a.getAttribute('href')));
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const idx = sections.indexOf(entry.target);
-        pills.forEach(p => p.classList.remove('active'));
-        if (idx > -1) pills[idx].classList.add('active');
+        links.forEach(a => a.classList.remove('active'));
+        if (idx > -1) { links[idx].classList.add('active'); current.textContent = links[idx].textContent.replace(/^\d+/, ''); }
       }
     });
   }, { rootMargin: '-40% 0px -50% 0px' });

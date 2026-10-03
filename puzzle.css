@@ -35,6 +35,9 @@
 .pz-iconbtn .eye-off { display: none; }
 .pz-iconbtn.active .eye-on { display: none; }
 .pz-iconbtn.active .eye-off { display: block; }
+.pz-iconbtn .snd-off { display: none; }
+.pz-iconbtn:not(.active) .snd-on { display: none; }
+.pz-iconbtn:not(.active) .snd-off { display: block; }
 .pz-ghost {
   font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 18px; white-space: nowrap;
   border: 1px solid var(--purple); background: var(--purple-light); color: var(--purple); cursor: pointer;

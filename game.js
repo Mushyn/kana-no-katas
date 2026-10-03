@@ -131,7 +131,8 @@ function startGridZoom() {
   const grid = document.getElementById('grid');
   gridZoomBox = grid.getBoundingClientRect();
   const cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-size')) || 44;
-  const z = Math.min(3.2, Math.max(1.8, 46 / cell));
+  const full = Math.min(3.2, Math.max(1.8, 46 / cell));   // zoom de départ : entre 1,8 et 3,2 selon la taille des cases
+  const z = 1 + (full - 1) / 2;                          // effet réduit de moitié : entre 1,4 et 2,1
   grid.style.setProperty('--zoom', z.toFixed(2));
   grid.classList.add('zooming');
 }

@@ -51,13 +51,25 @@
 
   // ── Voix (la même que dans le jeu Lecture : synthèse vocale de l'appareil) ──
   const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  // iPhone / iPad : la voix n'est autorisée que si une première phrase a été lancée pendant un geste de l'utilisateur.
+  // On lance donc une phrase muette au premier toucher d'une carte ; les suivantes peuvent ensuite partir plus tard.
+  let speechUnlocked = false;
+  function unlockSpeech() {
+    if (!canSpeak || speechUnlocked) return;
+    speechUnlocked = true;
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0; u.lang = 'ja-JP';
+      speechSynthesis.speak(u);
+    } catch (e) { /* ignoré */ }
+  }
   // Dit un kana puis appelle done() une seule fois (à la fin de la voix, ou après un délai de sécurité)
   function speakThen(text, done) {
     let called = false;
     const end = () => { if (!called) { called = true; done(); } };
     if (!canSpeak) { setTimeout(end, 800); return; }
     try {
-      speechSynthesis.cancel();
+      if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();   // couper une voix en cours, sans rien annuler d'inutile
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'ja-JP'; u.rate = 0.9;
       const vs = speechSynthesis.getVoices();
@@ -273,6 +285,9 @@
       // Œil : afficher / masquer les noms de colonnes et de lignes
       $('#pz-eye').onclick = () => { this.prefs.hints = !this.prefs.hints; this.save(); this.applyHints(); };
 
+      // Haut-parleur : prononcer (ou non) le kana quand la carte est posée dans une case à moitié juste
+      $('#pz-voice').onclick = () => { this.prefs.voice = this.prefs.voice === false; this.save(); this.applyVoice(); };
+
       // Gestes : glisser une carte / remuer le tas
       this.layer.addEventListener('pointerdown', e => this.onCardDown(e));
       this.layer.addEventListener('pointermove', e => { if (this.drag) this.moveDrag(e); });
@@ -300,6 +315,14 @@
       const b = $('#pz-eye');
       b.classList.toggle('active', !this.prefs.hints);
       b.setAttribute('aria-pressed', this.prefs.hints ? 'false' : 'true');
+    }
+
+    applyVoice() {
+      const on = this.prefs.voice !== false;                 // par défaut : la voix est active
+      const b = $('#pz-voice');
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.title = on ? 'Prononciation du kana en cas d\'erreur : activée' : 'Prononciation du kana en cas d\'erreur : désactivée';
     }
 
     startGame() {
@@ -369,6 +392,7 @@
         g.appendChild(col);
       });
       this.applyHints();
+      this.applyVoice();
       this.sizeGrid();
     }
 
@@ -477,6 +501,7 @@
       e.preventDefault();
       node.setPointerCapture(e.pointerId);
       initAudio();                                     // premier geste : on peut démarrer le son
+      unlockSpeech();                                  // ... et la voix (nécessaire sur iPhone)
       this.clock.start();                              // le chrono démarre au premier toucher
       this.drag = { id, from: this.game.slotOf(id) };
       node.classList.add('dragging');
@@ -601,7 +626,10 @@
         SOUNDS.near();
         this.showToast(res.status === 'yellow' ? 'Pas la bonne ligne !' : 'Pas la bonne colonne !');
         const chars = this.prefs.script === 'h' ? H : K;
-        this.later(() => speakThen(chars[id], () => this.later(giveBack, 150)), 350);   // le son du kana, puis retour au tas
+        // La voix démarre tout de suite (on est encore dans le geste du doigt qui lâche la carte : c'est ce qu'exige iPhone),
+        // puis la carte repart dans le tas une fois le kana prononcé.
+        if (this.prefs.voice !== false) speakThen(chars[id], () => this.later(giveBack, 150));
+        else this.later(giveBack, FEEDBACK_MS);           // voix coupée : on laisse juste le temps de lire le message
       }
     }
 
